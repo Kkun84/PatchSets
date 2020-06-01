@@ -1,0 +1,66 @@
+defaults:
+  - optimizer: Adam
+  - lr_scheduler: Step
+
+name: ''
+seed: ~
+
+hparams:
+  batch_size: 64
+  num_workers: 4
+  lr: 0.001
+  train_patch_n: 4
+  test_patch_n: 8
+  patch_size_n: 8
+
+model_params:
+  encoder:
+    input_n: ${hparams.patch_size_n}
+    hidden_n_0: 32
+    output_n: 32
+  decoder:
+    input_n: 32
+    hidden_n_0: 32
+    output_n: 10
+
+optim:
+  optimizer: ${optimizer}
+  # lr_scheduler: ${lr_scheduler}
+  lr_scheduler: ~
+  # encoder:
+  #   optimizer: ${optimizer}
+  #   lr_scheduler: ${lr_scheduler}
+  # decoder:
+  #   optimizer: ${optimizer}
+  #   lr_scheduler: ${lr_scheduler}
+
+trainer:
+  gpus: 1
+  num_nodes: 1
+
+callback:
+  checkpoint:
+    class: pytorch_lightning.callbacks.ModelCheckpoint
+    params:
+      filepath: ~
+      monitor: val_loss
+      verbose: False
+      save_top_k: 2
+      mode: auto
+  early_stopping:
+    class: pytorch_lightning.callbacks.EarlyStopping
+    params:
+      monitor: val_loss
+      min_delta: 0
+      patience: 10
+      verbose: False
+      mode: auto
+  callbacks:
+    ~
+
+loggers:
+  - class: pytorch_lightning.loggers.TensorBoardLogger
+    params:
+      save_dir: '.'
+      name: ''
+      version: ''
