@@ -19,11 +19,13 @@ model_params:
       - 1
       - ${hparams.patch_size}
       - ${hparams.patch_size}
-    hidden_n_0: 32
-    output_n: 32
+    hidden_n_0: 256
+    hidden_n_1: 256
+    output_n: 256
   decoder:
-    input_n: 32
-    hidden_n_0: 32
+    input_n: 256
+    hidden_n_0: 256
+    hidden_n_1: 256
     output_n: 10
 
 optim:
