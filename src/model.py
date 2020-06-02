@@ -24,10 +24,12 @@ class Encoder(pl.LightningModule):
 
         self.input_n = np.prod([self.model_params.input_shape[i] for i in range(len(self.model_params.input_shape))])
         hidden_n_0 = self.model_params.hidden_n_0
+        hidden_n_1 = self.model_params.hidden_n_1
         self.output_n = self.model_params.output_n
 
         self.linear_0 = torch.nn.Linear(self.input_n, hidden_n_0)
-        self.linear_1 = torch.nn.Linear(hidden_n_0, self.output_n)
+        self.linear_1 = torch.nn.Linear(hidden_n_0, hidden_n_1)
+        self.linear_2 = torch.nn.Linear(hidden_n_1, self.output_n)
 
     def forward(self, input):
         # [batch, sets, channels, x, y]
@@ -36,10 +38,11 @@ class Encoder(pl.LightningModule):
         x = input.reshape([input.shape[0]*input.shape[1], self.input_n])
         logger.debug(f"reshape-x.shape={x.shape}")
         x = self.linear_0(x)
-        logger.debug(f"linear_0-x.shape={x.shape}")
         x = F.relu(x)
         x = self.linear_1(x)
-        logger.debug(f"linear_1-x.shape={x.shape}")
+        x = F.relu(x)
+        x = self.linear_2(x)
+        logger.debug(f"linear-x.shape={x.shape}")
         x = x.reshape([input.shape[0], input.shape[1], self.output_n])
         logger.debug(f"reshape-x.shape={x.shape}")
         x = x.mean(1)
@@ -57,19 +60,22 @@ class Decoder(pl.LightningModule):
 
         self.input_n = self.model_params.input_n
         hidden_n_0 = self.model_params.hidden_n_0
+        hidden_n_1 = self.model_params.hidden_n_1
         self.output_n = self.model_params.output_n
 
         self.linear_0 = torch.nn.Linear(self.input_n, hidden_n_0)
-        self.linear_1 = torch.nn.Linear(hidden_n_0, self.output_n)
+        self.linear_1 = torch.nn.Linear(hidden_n_0, hidden_n_1)
+        self.linear_2 = torch.nn.Linear(hidden_n_1, self.output_n)
 
     def forward(self, input):
         # [batch, lattent]
         logger.debug(f"input.shape={input.shape}")
         x = self.linear_0(input)
-        logger.debug(f"linear_0-x.shape={x.shape}")
         x = F.relu(x)
         x = self.linear_1(x)
-        logger.debug(f"linear_1-x.shape={x.shape}")
+        x = F.relu(x)
+        x = self.linear_2(x)
+        logger.debug(f"linear-x.shape={x.shape}")
         return x
 
 
