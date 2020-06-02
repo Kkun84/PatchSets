@@ -15,7 +15,10 @@ hparams:
 
 model_params:
   encoder:
-    input_shape: [1, ${hparams.patch_size}, ${hparams.patch_size}]
+    input_shape:
+      - 1
+      - ${hparams.patch_size}
+      - ${hparams.patch_size}
     hidden_n_0: 32
     output_n: 32
   decoder:
@@ -45,7 +48,7 @@ callback:
       filepath: ~
       monitor: val_loss
       verbose: False
-      save_top_k: 2
+      save_top_k: 3
       mode: auto
   early_stopping:
     class: pytorch_lightning.callbacks.EarlyStopping
