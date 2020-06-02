@@ -1,6 +1,7 @@
 from logging import getLogger
 import hydra
 import argparse
+import numpy as np
 import torch
 from torch.nn import functional as F
 from torch.utils.data import DataLoader, random_split
@@ -8,8 +9,68 @@ from torchvision.datasets import MNIST
 from torchvision import transforms
 import pytorch_lightning as pl
 
+from .patch import make_patch2d
+
 
 logger = getLogger(__name__)
+
+
+class Encoder(pl.LightningModule):
+
+    def __init__(self, model_params):
+        super().__init__()
+        self.model_params = model_params
+        self.hparams = {}
+
+        self.input_n = np.prod(self.model_params.input_shape)
+        hidden_n_0 = self.model_params.hidden_n_0
+        self.output_n = self.model_params.output_n
+
+        self.linear_0 = torch.nn.Linear(self.input_n, hidden_n_0)
+        self.linear_1 = torch.nn.Linear(hidden_n_0, self.output_n)
+
+    def forward(self, input):
+        # [batch, sets, channels, x, y]
+        logger.debug(f"input.shape={input.shape}")
+        logger.debug([input.shape[0]*input.shape[1], self.input_n])
+        x = input.reshape([input.shape[0]*input.shape[1], self.input_n])
+        logger.debug(f"reshape-x.shape={x.shape}")
+        x = self.linear_0(x)
+        logger.debug(f"linear_0-x.shape={x.shape}")
+        x = F.relu(x)
+        x = self.linear_1(x)
+        logger.debug(f"linear_1-x.shape={x.shape}")
+        x = x.reshape([input.shape[0], input.shape[1], self.output_n])
+        logger.debug(f"reshape-x.shape={x.shape}")
+        x = x.mean(1)
+        logger.debug(f"mean-x.shape={x.shape}")
+        # [batch, lattent]
+        return x
+
+
+class Decoder(pl.LightningModule):
+
+    def __init__(self, model_params):
+        super().__init__()
+        self.model_params = model_params
+        self.hparams = {}
+
+        self.input_n = self.model_params.input_n
+        hidden_n_0 = self.model_params.hidden_n_0
+        self.output_n = self.model_params.output_n
+
+        self.linear_0 = torch.nn.Linear(self.input_n, hidden_n_0)
+        self.linear_1 = torch.nn.Linear(hidden_n_0, self.output_n)
+
+    def forward(self, input):
+        # [batch, lattent]
+        logger.debug(f"input.shape={input.shape}")
+        x = self.linear_0(input)
+        logger.debug(f"linear_0-x.shape={x.shape}")
+        x = F.relu(x)
+        x = self.linear_1(x)
+        logger.debug(f"linear_1-x.shape={x.shape}")
+        return x
 
 
 class Model(pl.LightningModule):
@@ -23,21 +84,24 @@ class Model(pl.LightningModule):
         self.encoder = Encoder(model_params.encoder)
         self.decoder = Decoder(model_params.decoder)
 
-    def forward(self, patch_sets):
-        x = self.encoder(patch_sets)
-        x = self.decoder(x)
-        return x
+        self.input_n = self.encoder.input_n
+        self.output_n = self.decoder.output_n
+
+    def forward(self, input):
+        logger.debug(f"input.shape={input.shape}")
+        z = self.encoder(input)
+        logger.debug(f"z.shape={z.shape}")
+        output = self.decoder(z)
+        logger.debug(f"output.shape={output.shape}")
+        return output
 
     def configure_optimizers(self):
         logger.debug('configure_optimizers')
-        keys = ['encoder', 'decoder']
-        # optimizer = [hydra.utils.instantiate(self.optim[i].optimizer, self.parameters()) for i in keys]
-        # lr_scheduler = [hydra.utils.instantiate(self.optim[i].lr_scheduler, self.parameters()) for i in keys]
         optimizer = hydra.utils.instantiate(self.optim.optimizer, self.parameters())
         if self.optim.lr_scheduler is None:
-            return optimizer
+            return [optimizer], []
         lr_scheduler = hydra.utils.instantiate(self.optim.lr_scheduler, self.parameters())
-        return optimizer, lr_scheduler
+        return [optimizer], [lr_scheduler]
 
     def prepare_data(self):
         logger.debug('prepare_data')
@@ -71,7 +135,7 @@ class Model(pl.LightningModule):
     def training_step(self, batch, batch_idx):
         logger.debug(f'training_step-{batch_idx}')
         x, y = batch
-        y_hat = self(self.make_patch(x, self.hparams.train_patch_n))
+        y_hat = self(make_patch2d(x, self.hparams.patch_size, self.hparams.train_patch_n))
         loss = F.cross_entropy(y_hat, y)
         tensorboard_logs = {'train_loss': loss}
         return {'loss': loss, 'log': tensorboard_logs}
@@ -79,7 +143,7 @@ class Model(pl.LightningModule):
     def validation_step(self, batch, batch_idx):
         logger.debug(f'validation_step-{batch_idx}')
         x, y = batch
-        y_hat = self(self.make_patch(x, self.hparams.test_patch_n))
+        y_hat = self(make_patch2d(x, self.hparams.patch_size, self.hparams.test_patch_n))
         correct = (y == y_hat.argmax(1)).float()
         return {'loss': F.cross_entropy(y_hat, y, reduction='sum'), 'correct': correct}
 
@@ -93,7 +157,7 @@ class Model(pl.LightningModule):
     def test_step(self, batch, batch_idx):
         logger.debug(f'test_step-{batch_idx}')
         x, y = batch
-        y_hat = self(self.make_patch(x, self.hparams.test_patch_n))
+        y_hat = self(make_patch2d(x, self.hparams.patch_size, self.hparams.test_patch_n))
         correct = (y == y_hat.argmax(1)).float()
         return {'loss': F.cross_entropy(y_hat, y, reduction='sum'), 'correct': correct}
 
@@ -105,85 +169,3 @@ class Model(pl.LightningModule):
         if self.logger is not None:
             self.logger.log_metrics(tensorboard_logs, self.global_step)
         return {'test_loss': avg_loss, 'log': tensorboard_logs}
-
-    def make_patch(self, x, patch_n=None):
-        logger.debug(f"x.shape={x.shape}")
-        index = [
-            torch.arange(x.shape[0])[:, None, None, None, None],
-            torch.arange(x.shape[1])[None, None, :, None, None],
-            torch.randint(0, x.shape[2] - self.hparams.patch_size_n, [x.shape[0], patch_n, 1, 1, 1]) + torch.arange(self.hparams.patch_size_n)[None, None, None, :, None],
-            torch.randint(0, x.shape[3] - self.hparams.patch_size_n, [x.shape[0], patch_n, 1, 1, 1]) + torch.arange(self.hparams.patch_size_n)[None, None, None, None, :],
-        ]
-        logger.debug(f"index.shape={[i.shape for i in index]}")
-        x = x[index]
-        logger.debug(f"x.shape={x.shape}")
-        # if n is None:
-        #     # n = torch.randint(1, 16, [1])[0]
-        #     n = self.hparams.patch_n
-        # y = []
-        # for _ in range(n):
-        #     a = torch.randint(0, x.shape[2] - 8, [1])
-        #     b = torch.randint(0, x.shape[3] - 8, [1])
-        #     y.append(x[:, :, a:a+8, b:b+8])
-        # y = torch.stack(y)
-        # y = y.permute(1, 0, 2, 3, 4)
-        # [batch, n, x, y]
-        return x
-
-
-class Encoder(pl.LightningModule):
-
-    def __init__(self, model_params):
-        super().__init__()
-        self.model_params = model_params
-        self.hparams = {}
-
-        self.input_n = self.model_params.input_n
-        hidden_n_0 = self.model_params.hidden_n_0
-        self.output_n = self.model_params.output_n
-
-        self.linear_0 = torch.nn.Linear(self.input_n**2, hidden_n_0)
-        self.linear_1 = torch.nn.Linear(hidden_n_0, self.output_n)
-
-    def forward(self, patch_sets):
-        # [batch, sets, channels, x, y]
-        logger.debug(f"input-patch_sets.shape={patch_sets.shape}")
-        x = patch_sets
-        x = x.reshape([x.shape[0]*x.shape[1], -1])
-        logger.debug(f"reshape-x.shape={x.shape}")
-        x = self.linear_0(x)
-        logger.debug(f"linear_0-x.shape={x.shape}")
-        x = F.relu(x)
-        x = self.linear_1(x)
-        logger.debug(f"linear_1-x.shape={x.shape}")
-        x = x.reshape([patch_sets.shape[0], patch_sets.shape[1], -1])
-        logger.debug(f"reshape-x.shape={x.shape}")
-        x = x.mean(1)
-        logger.debug(f"mean-x.shape={x.shape}")
-        # [batch, lattent]
-        return x
-
-
-class Decoder(pl.LightningModule):
-
-    def __init__(self, model_params):
-        super().__init__()
-        self.model_params = model_params
-        self.hparams = {}
-
-        self.input_n = self.model_params.input_n
-        hidden_n_0 = self.model_params.hidden_n_0
-        self.output_n = self.model_params.output_n
-
-        self.linear_0 = torch.nn.Linear(self.model_params.input_n, hidden_n_0)
-        self.linear_1 = torch.nn.Linear(hidden_n_0, self.output_n)
-
-    def forward(self, x):
-        # [batch, lattent]
-        logger.debug(f"input-x.shape={x.shape}")
-        x = self.linear_0(x)
-        logger.debug(f"linear_0-x.shape={x.shape}")
-        x = F.relu(x)
-        x = self.linear_1(x)
-        logger.debug(f"linear_1-x.shape={x.shape}")
-        return x

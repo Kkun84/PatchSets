@@ -11,11 +11,11 @@ hparams:
   lr: 0.001
   train_patch_n: 4
   test_patch_n: 8
-  patch_size_n: 8
+  patch_size: 8
 
 model_params:
   encoder:
-    input_n: ${hparams.patch_size_n}
+    input_shape: [1, ${hparams.patch_size}, ${hparams.patch_size}]
     hidden_n_0: 32
     output_n: 32
   decoder:
@@ -64,3 +64,9 @@ loggers:
       save_dir: '.'
       name: ''
       version: ''
+  - class: pytorch_lightning.loggers.MLFlowLogger
+    params:
+      experiment_name: default
+      tracking_uri: ~
+      tags: ~
+      save_dir: ~
