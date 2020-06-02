@@ -6,7 +6,7 @@ name: ''
 seed: ~
 
 hparams:
-  batch_size: 64
+  batch_size: 1024
   num_workers: 4
   lr: 0.001
   train_patch_n: 4
@@ -32,12 +32,6 @@ optim:
   optimizer: ${optimizer}
   # lr_scheduler: ${lr_scheduler}
   lr_scheduler: ~
-  # encoder:
-  #   optimizer: ${optimizer}
-  #   lr_scheduler: ${lr_scheduler}
-  # decoder:
-  #   optimizer: ${optimizer}
-  #   lr_scheduler: ${lr_scheduler}
 
 trainer:
   gpus: 1
@@ -57,7 +51,7 @@ callback:
     params:
       monitor: val_loss
       min_delta: 0
-      patience: 10
+      patience: 100
       verbose: False
       mode: auto
   callbacks:
