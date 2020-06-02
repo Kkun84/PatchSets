@@ -165,7 +165,7 @@ class Model(pl.LightningModule):
         logger.debug('test_epoch_end')
         avg_loss = torch.stack([x['loss'] for x in outputs]).sum() / len(self.test_dataset)
         accuracy = torch.cat([x['correct'] for x in outputs]).mean()
-        tensorboard_logs = {'test_loss': avg_loss, 'test_accuracy': accuracy}
+        tensorboard_logs = {'test_loss': avg_loss.item(), 'test_accuracy': accuracy.item()}
         if self.logger is not None:
             self.logger.log_metrics(tensorboard_logs, self.global_step)
         return {'test_loss': avg_loss, 'log': tensorboard_logs}
