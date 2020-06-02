@@ -9,7 +9,7 @@ from torchvision.datasets import MNIST
 from torchvision import transforms
 import pytorch_lightning as pl
 
-from .patch import make_patch2d
+from src.patch import make_patch2d
 
 
 logger = getLogger(__name__)
@@ -22,7 +22,7 @@ class Encoder(pl.LightningModule):
         self.model_params = model_params
         self.hparams = {}
 
-        self.input_n = np.prod(self.model_params.input_shape)
+        self.input_n = np.prod([self.model_params.input_shape[i] for i in range(len(self.model_params.input_shape))])
         hidden_n_0 = self.model_params.hidden_n_0
         self.output_n = self.model_params.output_n
 
