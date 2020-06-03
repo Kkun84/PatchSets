@@ -10,7 +10,7 @@ hparams:
   num_workers: 4
   lr: 0.001
   train_patch_n: 4
-  test_patch_n: 8
+  test_patch_n: 4
   patch_size: 8
 
 model_params:
@@ -19,13 +19,13 @@ model_params:
       - 1
       - ${hparams.patch_size}
       - ${hparams.patch_size}
-    hidden_n_0: 256
-    hidden_n_1: 256
-    output_n: 256
+    hidden_n_0: 64
+    hidden_n_1: 64
+    output_n: 64
   decoder:
-    input_n: 256
-    hidden_n_0: 256
-    hidden_n_1: 256
+    input_n: 64
+    hidden_n_0: 64
+    hidden_n_1: 64
     output_n: 10
 
 optim:
@@ -65,7 +65,7 @@ loggers:
       version: ''
   - class: pytorch_lightning.loggers.MLFlowLogger
     params:
-      experiment_name: default
-      tracking_uri: ~
+      experiment_name: Default
+      tracking_uri: "file:/workspace/mlruns"
       tags: ~
       save_dir: ~
