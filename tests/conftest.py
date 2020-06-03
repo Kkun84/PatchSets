@@ -25,17 +25,17 @@ def lr(request):
     return request.param
 
 
-@pytest.fixture(params=[1, 2, 3])
+@pytest.fixture(params=[[1], [2, 3], [4, 5, 6]])
 def patch_n(request):
     return request.param
 
 
-@pytest.fixture(params=[1, 2, 3])
+@pytest.fixture(params=[[1], [2, 3], [4, 5, 6]])
 def train_patch_n(request):
     return request.param
 
 
-@pytest.fixture(params=[1, 2, 3])
+@pytest.fixture(params=[[1], [2, 3], [4, 5, 6]])
 def test_patch_n(request):
     return request.param
 
@@ -98,8 +98,8 @@ def batch(batch_size, channels, patch_size):
 def model_params(channels, patch_size):
     return hydra.utils.DictConfig(dict(
         # encoder=dict(input_n=channels * patch_size**2, hidden_n_0=11, output_n=13),
-        encoder=dict(input_shape=[channels, patch_size, patch_size], hidden_n_0=11, output_n=13),
-        decoder=dict(input_n=13, hidden_n_0=17, output_n=23),
+        encoder=dict(input_shape=[channels, patch_size, patch_size], hidden_n_0=11, hidden_n_1=13, output_n=17),
+        decoder=dict(input_n=17, hidden_n_0=23, hidden_n_1=29, output_n=31),
     ))
 
 
