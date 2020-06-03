@@ -17,12 +17,14 @@ def test_Encoder(batch_size, patch_n, model_params):
     assert hasattr(encoder, 'input_n')
     assert hasattr(encoder, 'output_n')
 
-    x = torch.rand([batch_size, patch_n, encoder.input_n])
-    z = encoder(x)
-    assert z.shape[1] == encoder.output_n
+    for n in patch_n:
+        x = torch.rand([batch_size, n, encoder.input_n])
+        z = encoder(x)
+        assert z.shape[1] == encoder.output_n
+    return
 
 
-def test_Decoder(batch_size, patch_n, model_params):
+def test_Decoder(batch_size, model_params):
     assert issubclass(Decoder, torch.nn.Module)
 
     decoder = Decoder(model_params.decoder)
@@ -32,6 +34,7 @@ def test_Decoder(batch_size, patch_n, model_params):
     x = torch.rand([batch_size, decoder.input_n])
     y = decoder(x)
     assert y.shape[1] == decoder.output_n
+    return
 
 
 def test_Model(model_params, hparams, optim, data_path, batch):
@@ -46,11 +49,12 @@ def test_Model(model_params, hparams, optim, data_path, batch):
     else:
         assert lr_scheduler is None
 
-    x = make_patch2d(batch[0], hparams.patch_size, hparams.train_patch_n)
-    logger.debug(f"x.shape={x.shape}")
-    y = model(x)
-    logger.debug(f"y.shape={y.shape}")
-    assert y.shape[1] == model.output_n
+    for patch_n in [*hparams.train_patch_n, *hparams.test_patch_n]:
+        x = make_patch2d(batch[0], hparams.patch_size, patch_n)
+        logger.debug(f"x.shape={x.shape}")
+        y = model(x)
+        logger.debug(f"y.shape={y.shape}")
+        assert y.shape[1] == model.output_n
 
     model.prepare_data()
     model.training_epoch_end([model.training_step(batch, None)])
