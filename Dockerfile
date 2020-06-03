@@ -1,5 +1,8 @@
 FROM pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
 
+# for Timezone setting
+RUN apt-get update && apt-get install -y tzdata
+
 # SSH setting
 # https://docs.docker.com/engine/examples/running_ssh_service/#build-an-eg_sshd-image
 RUN apt-get update && apt-get install -y openssh-server
