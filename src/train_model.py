@@ -12,13 +12,7 @@ logger = getLogger(__name__)
 def main(cfg):
     logger.info(f"\n{cfg.pretty()}")
 
-    logger.debug(cfg.model_params)
-    logger.debug(cfg.hparams)
-    logger.debug(cfg.optim)
-    logger.debug(hydra.utils.to_absolute_path('./data'))
-    # model = Model(None, None, None, None)
     model = Model(cfg.model_params, cfg.hparams, cfg.optim, hydra.utils.to_absolute_path('./data'))
-
 
     trainer_params = {}
 
