@@ -3,6 +3,7 @@ defaults:
   - lr_scheduler: Step
 
 name: ''
+experiment_name: 'Default'
 seed: ~
 
 hparams:
@@ -65,7 +66,7 @@ loggers:
       version: ''
   - class: pytorch_lightning.loggers.MLFlowLogger
     params:
-      experiment_name: Default
+      experiment_name: ${experiment_name}
       tracking_uri: "file:/workspace/mlruns"
       tags: ~
       save_dir: ~
