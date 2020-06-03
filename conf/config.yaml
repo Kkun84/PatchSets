@@ -9,8 +9,8 @@ hparams:
   batch_size: 1024
   num_workers: 4
   lr: 0.001
-  train_patch_n: 4
-  test_patch_n: 4
+  train_patch_n: [1, 2, 4, 8, 16]
+  test_patch_n: [1, 2, 4, 8, 16]
   patch_size: 8
 
 model_params:
