@@ -1,3 +1,5 @@
 __pycache__/
+
 /outputs/
 /multirun/
+/mlruns/
