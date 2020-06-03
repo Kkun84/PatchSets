@@ -140,38 +140,66 @@ class Model(pl.LightningModule):
 
     def training_step(self, batch, batch_idx):
         logger.debug(f'training_step-{batch_idx}')
-        x, y = batch
-        y_hat = self(make_patch2d(x, self.hparams.patch_size, self.hparams.train_patch_n))
-        loss = F.cross_entropy(y_hat, y)
-        tensorboard_logs = {'train_loss': loss}
-        return {'loss': loss, 'log': tensorboard_logs}
+        loss = []
+        for patch_n in self.hparams.train_patch_n:
+            x, y = batch
+            y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
+            loss.append(F.cross_entropy(y_hat, y))
+        total_loss = sum(loss) / len(loss)
+        tensorboard_logs = {f"train_loss_{n}": l for l, n in zip(loss, self.hparams.train_patch_n)}
+        tensorboard_logs["train_loss"] = total_loss
+        return {'loss': total_loss, 'log': tensorboard_logs}
 
     def validation_step(self, batch, batch_idx):
         logger.debug(f'validation_step-{batch_idx}')
-        x, y = batch
-        y_hat = self(make_patch2d(x, self.hparams.patch_size, self.hparams.test_patch_n))
-        correct = (y == y_hat.argmax(1)).float()
-        return {'loss': F.cross_entropy(y_hat, y, reduction='sum'), 'correct': correct}
+        loss = []
+        correct = []
+        for patch_n in self.hparams.test_patch_n:
+            x, y = batch
+            y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
+            loss.append(F.cross_entropy(y_hat, y, reduction='sum'))
+            correct.append((y == y_hat.argmax(1)).float())
+        return {'sum_loss': loss, 'correct': correct}
 
     def validation_epoch_end(self, outputs):
         logger.debug('validation_epoch_end')
-        avg_loss = torch.stack([x['loss'] for x in outputs]).sum() / len(self.val_dataset)
-        accuracy = torch.cat([x['correct'] for x in outputs]).mean()
-        tensorboard_logs = {'val_loss': avg_loss, 'val_accuracy': accuracy}
-        return {'val_loss': avg_loss, 'log': tensorboard_logs}
+        loss = []
+        accuracy = []
+        for patch_n_i in range(len(self.hparams.test_patch_n)):
+            loss.append(torch.stack([x['sum_loss'][patch_n_i] for x in outputs]).sum() / len(self.val_dataset))
+            accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
+        total_loss = sum(loss) / len(loss)
+        total_accuracy = sum(accuracy) / len(accuracy)
+        tensorboard_logs = dict(**{'val_loss': total_loss, 'val_accuracy': total_accuracy},
+            **{f"val_loss_{n}": l for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"val_accuracy_{n}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
+        )
+        return {'val_loss': total_loss, 'log': tensorboard_logs}
 
     def test_step(self, batch, batch_idx):
         logger.debug(f'test_step-{batch_idx}')
-        x, y = batch
-        y_hat = self(make_patch2d(x, self.hparams.patch_size, self.hparams.test_patch_n))
-        correct = (y == y_hat.argmax(1)).float()
-        return {'loss': F.cross_entropy(y_hat, y, reduction='sum'), 'correct': correct}
+        loss = []
+        correct = []
+        for patch_n in self.hparams.test_patch_n:
+            x, y = batch
+            y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
+            loss.append(F.cross_entropy(y_hat, y, reduction='sum'))
+            correct.append((y == y_hat.argmax(1)).float())
+        return {'sum_loss': loss, 'correct': correct}
 
     def test_epoch_end(self, outputs):
         logger.debug('test_epoch_end')
-        avg_loss = torch.stack([x['loss'] for x in outputs]).sum() / len(self.test_dataset)
-        accuracy = torch.cat([x['correct'] for x in outputs]).mean()
-        tensorboard_logs = {'test_loss': avg_loss.item(), 'test_accuracy': accuracy.item()}
+        loss = []
+        accuracy = []
+        for patch_n_i in range(len(self.hparams.test_patch_n)):
+            loss.append(torch.stack([x['sum_loss'][patch_n_i] for x in outputs]).sum() / len(self.test_dataset))
+            accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
+        total_loss = sum(loss) / len(loss)
+        total_accuracy = sum(accuracy) / len(accuracy)
+        tensorboard_logs = dict(**{'test_loss': total_loss, 'test_accuracy': total_accuracy},
+            **{f"test_loss_{n}": l for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"test_accuracy_{n}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
+        )
         if self.logger is not None:
             self.logger.log_metrics(tensorboard_logs, self.global_step)
-        return {'test_loss': avg_loss, 'log': tensorboard_logs}
+        return {'test_loss': total_loss, 'log': tensorboard_logs}
