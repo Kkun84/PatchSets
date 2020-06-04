@@ -8,6 +8,8 @@ logger = getLogger(__name__)
 def make_patch1d(input, patch_size, patch_n):
     # intput axis: [batch, channels, features]
     # output axis: [batch, sets, channels, features]
+    if input.shape[2] - patch_size == 0:
+        return input[:, None].repeat(1, patch_n, 1, 1)
     logger.debug(f"input.shape={input.shape}")
     logger.debug(f"patch_size={patch_size}")
     logger.debug(f"patch_n={patch_n}")
@@ -25,6 +27,8 @@ def make_patch1d(input, patch_size, patch_n):
 def make_patch2d(input, patch_size, patch_n):
     # intput axis: [batch, channels, height, width]
     # output axis: [batch, sets, channels, height, width]
+    if input.shape[2] - patch_size == 0:
+        return input[:, None].repeat(1, patch_n, 1, 1, 1)
     logger.debug(f"input.shape={input.shape}")
     logger.debug(f"patch_size={patch_size}")
     logger.debug(f"patch_n={patch_n}")
@@ -43,6 +47,8 @@ def make_patch2d(input, patch_size, patch_n):
 def make_patch3d(input, patch_size, patch_n):
     # intput axis: [batch, channels, ...]
     # output axis: [batch, sets, channels, ...]
+    if input.shape[2] - patch_size == 0:
+        return input[:, None].repeat(1, patch_n, 1, 1, 1, 1)
     logger.debug(f"input.shape={input.shape}")
     logger.debug(f"patch_size={patch_size}")
     logger.debug(f"patch_n={patch_n}")
