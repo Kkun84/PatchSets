@@ -149,7 +149,7 @@ class Model(pl.LightningModule):
             y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
             loss.append(F.cross_entropy(y_hat, y))
         total_loss = sum(loss) / len(loss)
-        metrics = {f"train_loss_{n:02}": l for l, n in zip(loss, self.hparams.train_patch_n)}
+        metrics = {f"train_loss_{n:03}": l for l, n in zip(loss, self.hparams.train_patch_n)}
         metrics["train_loss"] = total_loss
         return {'loss': total_loss, 'log': metrics}
 
@@ -175,8 +175,8 @@ class Model(pl.LightningModule):
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
             **{'val_loss': total_loss, 'val_accuracy': total_accuracy},
-            **{f"val_loss_{n:02}": l for l, n in zip(loss, self.hparams.test_patch_n)},
-            **{f"val_accuracy_{n:02}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
+            **{f"val_loss_{n:03}": l for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"val_accuracy_{n:03}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
         return {'val_loss': total_loss, 'log': metrics}
 
@@ -202,8 +202,8 @@ class Model(pl.LightningModule):
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
             **{'test_loss': total_loss.item(), 'test_accuracy': total_accuracy.item()},
-            **{f"test_loss_{n:02}": l.item() for l, n in zip(loss, self.hparams.test_patch_n)},
-            **{f"test_accuracy_{n:02}": a.item() for a, n in zip(accuracy, self.hparams.test_patch_n)}
+            **{f"test_loss_{n:03}": l.item() for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"test_accuracy_{n:03}": a.item() for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
         if self.logger is not None:
             self.logger.log_metrics(metrics, self.global_step)
