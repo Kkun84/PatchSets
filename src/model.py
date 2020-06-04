@@ -18,6 +18,7 @@ logger = getLogger(__name__)
 class Encoder(pl.LightningModule):
 
     def __init__(self, model_params):
+        logger.debug(f"Encoder.__init__(), model_params={model_params}")
         super().__init__()
         self.model_params = model_params
         self.hparams = {}
@@ -54,6 +55,7 @@ class Encoder(pl.LightningModule):
 class Decoder(pl.LightningModule):
 
     def __init__(self, model_params):
+        logger.debug(f"Decoder.__init__(), model_params={model_params}")
         super().__init__()
         self.model_params = model_params
         self.hparams = {}
@@ -82,6 +84,7 @@ class Decoder(pl.LightningModule):
 class Model(pl.LightningModule):
 
     def __init__(self, model_params, hparams, optim, data_path):
+        logger.debug(f"Model.__init__(), model_params={model_params}, hparams={hparams}, optim={optim}, data_path={data_path}")
         super().__init__()
         self.hparams = argparse.Namespace(**hparams)
         self.optim = optim
@@ -178,7 +181,7 @@ class Model(pl.LightningModule):
         return {'val_loss': total_loss, 'log': metrics}
 
     def test_step(self, batch, batch_idx):
-        logger.debug(f'test_step-{batch_idx}')
+        logger.info(f'test_step-{batch_idx}')
         loss = []
         correct = []
         for patch_n in self.hparams.test_patch_n:
@@ -189,7 +192,7 @@ class Model(pl.LightningModule):
         return {'sum_loss': loss, 'correct': correct}
 
     def test_epoch_end(self, outputs):
-        logger.debug('test_epoch_end')
+        logger.info('test_epoch_end')
         loss = []
         accuracy = []
         for patch_n_i in range(len(self.hparams.test_patch_n)):
