@@ -11,8 +11,9 @@ from src.patch import make_patch1d, make_patch2d, make_patch3d
 logger = getLogger(__name__)
 
 
-def test_train_make_patch1d(channels, batch_size, patch_size, patch_n):
-    shape = [batch_size, channels, *[patch_size + 8]*1]
+@pytest.mark.parametrize('margin', [0, 1, 2, 3])
+def test_train_make_patch1d(channels, batch_size, margin, patch_size, patch_n):
+    shape = [batch_size, channels, *[margin + patch_size]*1]
     x = torch.arange(np.prod(shape)).reshape(shape)
     for n in patch_n:
         y = make_patch1d(x, patch_size, n)
@@ -30,8 +31,9 @@ def test_train_make_patch1d(channels, batch_size, patch_size, patch_n):
                 break
 
 
-def test_train_make_patch2d(channels, batch_size, patch_size, patch_n):
-    shape = [batch_size, channels, *[patch_size + 8]*2]
+@pytest.mark.parametrize('margin', [0, 1, 2, 3])
+def test_train_make_patch1d(channels, batch_size, margin, patch_size, patch_n):
+    shape = [batch_size, channels, *[margin + patch_size]*2]
     x = torch.arange(np.prod(shape)).reshape(shape)
     for n in patch_n:
         y = make_patch2d(x, patch_size, n)
@@ -53,8 +55,9 @@ def test_train_make_patch2d(channels, batch_size, patch_size, patch_n):
                 break
 
 
-def test_train_make_patch3d(channels, batch_size, patch_size, patch_n):
-    shape = [batch_size, channels, *[patch_size + 8]*3]
+@pytest.mark.parametrize('margin', [0, 1, 2, 3])
+def test_train_make_patch1d(channels, batch_size, margin, patch_size, patch_n):
+    shape = [batch_size, channels, *[margin + patch_size]*3]
     x = torch.arange(np.prod(shape)).reshape(shape)
     for n in patch_n:
         y = make_patch3d(x, patch_size, n)
