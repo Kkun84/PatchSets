@@ -198,9 +198,9 @@ class Model(pl.LightningModule):
         total_loss = sum(loss) / len(loss)
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
-            **{'test_loss': total_loss, 'test_accuracy': total_accuracy},
-            **{f"test_loss_{n:02}": l for l, n in zip(loss, self.hparams.test_patch_n)},
-            **{f"test_accuracy_{n:02}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
+            **{'test_loss': total_loss.item(), 'test_accuracy': total_accuracy.item()},
+            **{f"test_loss_{n:02}": l.item() for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"test_accuracy_{n:02}": a.item() for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
         if self.logger is not None:
             self.logger.log_metrics(metrics, self.global_step)
