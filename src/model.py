@@ -102,7 +102,7 @@ class Model(pl.LightningModule):
         return output
 
     def configure_optimizers(self):
-        logger.debug('configure_optimizers')
+        logger.info('configure_optimizers')
         optimizer = hydra.utils.instantiate(self.optim.optimizer, self.parameters())
         if self.optim.lr_scheduler is None:
             return [optimizer], []
@@ -110,7 +110,7 @@ class Model(pl.LightningModule):
         return [optimizer], [lr_scheduler]
 
     def prepare_data(self):
-        logger.debug('prepare_data')
+        logger.info('prepare_data')
         train_dataset = MNIST(root=self.data_path, train=True, download=True, transform=transforms.ToTensor())
         test_dataset = MNIST(root=self.data_path, train=False, download=True, transform=transforms.ToTensor())
 
@@ -170,7 +170,8 @@ class Model(pl.LightningModule):
             accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
         total_loss = sum(loss) / len(loss)
         total_accuracy = sum(accuracy) / len(accuracy)
-        metrics = dict(**{'val_loss': total_loss, 'val_accuracy': total_accuracy},
+        metrics = dict(
+            **{'val_loss': total_loss, 'val_accuracy': total_accuracy},
             **{f"val_loss_{n:02}": l for l, n in zip(loss, self.hparams.test_patch_n)},
             **{f"val_accuracy_{n:02}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
@@ -196,10 +197,12 @@ class Model(pl.LightningModule):
             accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
         total_loss = sum(loss) / len(loss)
         total_accuracy = sum(accuracy) / len(accuracy)
-        metrics = dict(**{'test_loss': total_loss, 'test_accuracy': total_accuracy},
+        metrics = dict(
+            **{'test_loss': total_loss, 'test_accuracy': total_accuracy},
             **{f"test_loss_{n:02}": l for l, n in zip(loss, self.hparams.test_patch_n)},
             **{f"test_accuracy_{n:02}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
         if self.logger is not None:
             self.logger.log_metrics(metrics, self.global_step)
+        logger.info(metrics)
         return {'test_loss': total_loss, 'log': metrics}
