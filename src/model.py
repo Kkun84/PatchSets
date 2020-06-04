@@ -46,7 +46,7 @@ class Encoder(pl.LightningModule):
         logger.debug(f"linear-x.shape={x.shape}")
         x = x.reshape([input.shape[0], input.shape[1], self.output_n])
         logger.debug(f"reshape-x.shape={x.shape}")
-        x = x.mean(1)
+        x = x.sum(1) / x.shape[1] ** self.model_params.n_pow
         logger.debug(f"mean-x.shape={x.shape}")
         # [batch, lattent]
         return x
