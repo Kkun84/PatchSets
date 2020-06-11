@@ -125,6 +125,6 @@ def optim(optimizer, scheduler):
 
 @pytest.fixture(scope='session')
 def data_path(tmpdir_factory):
-    # tmpdir = tmpdir_factory.mktemp('tmp')
-    tmpdir = 'data'
+    tmpdir = tmpdir_factory.mktemp('tmp')
+    # tmpdir = 'data'
     return tmpdir
