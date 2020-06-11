@@ -5,12 +5,12 @@ import torch
 import pytest
 
 
-@pytest.fixture(params=[1, 2, 3])
+@pytest.fixture(params=[1, 2])
 def batch_size(request):
     return request.param
 
 
-@pytest.fixture(params=[1, 2, 3])
+@pytest.fixture(params=[1, 2])
 def channels(request):
     return request.param
 
@@ -25,22 +25,22 @@ def lr(request):
     return request.param
 
 
-@pytest.fixture(params=[[1], [2, 3], [4, 5, 6]])
+@pytest.fixture(params=[[1], [2, 3]])
 def patch_n(request):
     return request.param
 
 
-@pytest.fixture(params=[[1], [2, 3], [4, 5, 6]])
+@pytest.fixture(params=[[1], [2, 3]])
 def train_patch_n(request):
     return request.param
 
 
-@pytest.fixture(params=[[1], [2, 3], [4, 5, 6]])
+@pytest.fixture(params=[[1], [2, 3]])
 def test_patch_n(request):
     return request.param
 
 
-@pytest.fixture(params=[1, 2, 3])
+@pytest.fixture(params=[1, 2])
 def patch_size(request):
     return request.param
 
@@ -104,7 +104,7 @@ def model_params(channels, patch_size):
 
 
 @pytest.fixture
-def hparams(batch_size, num_workers, lr, train_patch_n, test_patch_n, patch_size):
+def hparams(batch_size, num_workers, lr, train_patch_n, test_patch_n, patch_size, latent_dim):
     return hydra.utils.DictConfig(dict(
         batch_size=batch_size,
         num_workers=num_workers,
@@ -112,6 +112,7 @@ def hparams(batch_size, num_workers, lr, train_patch_n, test_patch_n, patch_size
         train_patch_n=train_patch_n,
         test_patch_n=test_patch_n,
         patch_size=patch_size,
+        latent_dim=latent_dim,
     ))
 
 
