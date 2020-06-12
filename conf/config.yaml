@@ -13,6 +13,7 @@ hparams:
   train_patch_n: [1, 2, 4, 8, 16]
   test_patch_n: [1, 2, 4, 8, 16]
   patch_size: 8
+  latent_dim: 64
 
 model_params:
   encoder:
@@ -22,9 +23,9 @@ model_params:
       - ${hparams.patch_size}
     hidden_n_0: 64
     hidden_n_1: 64
-    output_n: 64
+    output_n: ${hparams.latent_dim}
   decoder:
-    input_n: 64
+    input_n: ${hparams.latent_dim}
     hidden_n_0: 64
     hidden_n_1: 64
     output_n: 10

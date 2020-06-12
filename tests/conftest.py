@@ -45,6 +45,11 @@ def patch_size(request):
     return request.param
 
 
+@pytest.fixture(params=[1, 2])
+def latent_dim(request):
+    return request.param
+
+
 @pytest.fixture(params=[
     # {
     #     'class': 'torch.optim.SGD',
