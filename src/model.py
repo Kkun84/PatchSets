@@ -46,7 +46,7 @@ class Encoder(pl.LightningModule):
         logger.debug(f"linear-x.shape={x.shape}")
         x = x.reshape([input.shape[0], input.shape[1], self.output_n])
         logger.debug(f"reshape-x.shape={x.shape}")
-        x = x.mean(1)
+        x = x.sum(1) / x.shape[1] ** self.model_params.n_pow
         logger.debug(f"mean-x.shape={x.shape}")
         # [batch, lattent]
         return x
@@ -149,7 +149,7 @@ class Model(pl.LightningModule):
             y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
             loss.append(F.cross_entropy(y_hat, y))
         total_loss = sum(loss) / len(loss)
-        metrics = {f"train_loss_{n:02}": l for l, n in zip(loss, self.hparams.train_patch_n)}
+        metrics = {f"train_loss_{n:03}": l for l, n in zip(loss, self.hparams.train_patch_n)}
         metrics["train_loss"] = total_loss
         return {'loss': total_loss, 'log': metrics}
 
