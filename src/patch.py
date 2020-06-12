@@ -5,6 +5,20 @@ import torch
 logger = getLogger(__name__)
 
 
+def padding(src, axis, padding, pad_value=0):
+    if hasattr(axis, '__iter__'):
+        dst = src
+        for a in axis:
+            dst = padding(dst, a, padding, pad_value=0)
+        return dst
+    logger.debug(f"{src.shape=}, {axis=}, {padding=}, {pad_value=}")
+    pad_shape = [1] * src.ndim
+    pad_shape[axis] = padding
+    pad = torch.full(pad_shape, pad_value)
+    dst = torch.cat([pad, src, pad], axis)
+    return dst
+
+
 def make_patch1d(src, patch_size, patch_n, padding):
     # src axis: [batch, channels, features]
     # dst axis: [batch, sets, channels, features]
