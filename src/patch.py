@@ -5,10 +5,10 @@ import torch
 logger = getLogger(__name__)
 
 
-def make_patch1d(input, patch_size, patch_n):
+def make_patch1d(input, patch_size, patch_n, padding):
     # intput axis: [batch, channels, features]
     # output axis: [batch, sets, channels, features]
-    logger.debug(f"{input.shape=}, {patch_size=}, {patch_n=}")
+    logger.debug(f"{input.shape=}, {patch_size=}, {patch_n=}, {padding=}")
     if input.shape[2] - patch_size + padding == 0:
         return input[:, None].repeat(1, patch_n, 1, 1)
     patch_index = [
@@ -22,10 +22,10 @@ def make_patch1d(input, patch_size, patch_n):
     return output
 
 
-def make_patch2d(input, patch_size, patch_n):
+def make_patch2d(input, patch_size, patch_n, padding):
     # intput axis: [batch, channels, height, width]
     # output axis: [batch, sets, channels, height, width]
-    logger.debug(f"{input.shape=}, {patch_size=}, {patch_n=}")
+    logger.debug(f"{input.shape=}, {patch_size=}, {patch_n=}, {padding=}")
     if input.shape[2] - patch_size + padding == 0:
         return input[:, None].repeat(1, patch_n, 1, 1, 1)
     patch_index = [
