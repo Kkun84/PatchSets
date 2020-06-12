@@ -59,30 +59,3 @@ def test_train_make_patch2d(channels, batch_size, margin, patch_size, patch_n):
                     else:
                         assert False, 'The pattern did not match.'
                     break
-
-
-@pytest.mark.parametrize('margin', [0, 1, 2, 3])
-def test_train_make_patch3d(channels, batch_size, margin, patch_size, patch_n):
-    shape = [batch_size, channels, *[margin + patch_size]*3]
-    x = torch.arange(np.prod(shape)).reshape(shape)
-    for n in patch_n:
-        y = make_patch3d(x, patch_size, n)
-        logger.debug(f"x.shape={x.shape}")
-        logger.debug(f"y.shape={y.shape}")
-        assert list(y.shape) == [batch_size, n, channels, *[patch_size] * 3]
-
-        if margin == 0:
-            assert (x[:, None].repeat(1, n, 1, 1, 1, 1) == y).all()
-        else:
-            for _x, _y in zip(x, y):
-                for __y in _y:
-                    for index in itertools.product(*[range(i - patch_size) for i in _x.shape[1:]]):
-                        if (_x[:,
-                                index[0]: index[0] + patch_size,
-                                index[1]: index[1] + patch_size,
-                                index[2]: index[2] + patch_size,
-                                ] == __y).all():
-                            break
-                    else:
-                        assert False, 'The pattern did not match.'
-                    break
