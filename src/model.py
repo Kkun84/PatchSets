@@ -83,12 +83,12 @@ class Decoder(pl.LightningModule):
 
 class Model(pl.LightningModule):
 
-    def __init__(self, model_params, hparams, optim, data_path):
-        logger.debug(f"Model.__init__(), model_params={model_params}, hparams={hparams}, optim={optim}, data_path={data_path}")
+    def __init__(self, model_params, hparams, optim, dataset):
+        logger.debug(f"Model.__init__(), model_params={model_params}, hparams={hparams}, optim={optim}, dataset={dataset}")
         super().__init__()
         self.hparams = argparse.Namespace(**hparams)
         self.optim = optim
-        self.data_path = data_path
+        self.dataset = dataset
 
         self.encoder = Encoder(model_params.encoder)
         self.decoder = Decoder(model_params.decoder)
@@ -114,14 +114,18 @@ class Model(pl.LightningModule):
 
     def prepare_data(self):
         logger.info('prepare_data')
-        train_dataset = MNIST(root=self.data_path, train=True, download=True, transform=transforms.ToTensor())
-        test_dataset = MNIST(root=self.data_path, train=False, download=True, transform=transforms.ToTensor())
+        if self.dataset.name == 'MNIST':
+            path = hydra.utils.to_absolute_path(self.dataset.path)
+            train_dataset = MNIST(root=path, train=True, download=True, transform=transforms.ToTensor())
+            test_dataset = MNIST(root=path, train=False, download=True, transform=transforms.ToTensor())
 
-        train_dataset, val_dataset = random_split(train_dataset, [55000, 5000])
+            train_dataset, val_dataset = random_split(train_dataset, [55000, 5000])
 
-        self.train_dataset = train_dataset
-        self.val_dataset = val_dataset
-        self.test_dataset = test_dataset
+            self.train_dataset = train_dataset
+            self.val_dataset = val_dataset
+            self.test_dataset = test_dataset
+        else:
+            assert False
 
     def train_dataloader(self):
         logger.debug('train_dataloader')

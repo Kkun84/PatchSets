@@ -1,5 +1,8 @@
 from logging import getLogger
 import hydra
+import random
+import numpy as np
+import torch
 import pytorch_lightning as pl
 
 from model import Model
@@ -11,6 +14,15 @@ logger = getLogger(__name__)
 @hydra.main(config_path='../conf/config.yaml')
 def main(cfg):
     logger.info(f"\n{cfg.pretty()}")
+
+    if cfg.seed is not False:
+        cudnn.deterministic = cudnn_deterministic
+
+    if cfg.seed is not None:
+        random.seed(seed)
+        np.random.seed(seed)
+        torch.manual_seed(seed)
+        torch.cuda.manual_seed(seed)
 
     model = Model(cfg.model_params, cfg.hparams, cfg.optim, hydra.utils.to_absolute_path('./data'))
 

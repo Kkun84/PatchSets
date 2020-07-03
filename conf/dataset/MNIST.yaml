@@ -1,0 +1,3 @@
+dataset:
+  name: MNIST
+  path: './data'

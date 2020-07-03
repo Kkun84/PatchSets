@@ -137,5 +137,13 @@ def optim(optimizer, scheduler):
 @pytest.fixture(scope='session')
 def data_path(tmpdir_factory):
     tmpdir = tmpdir_factory.mktemp('tmp')
-    # tmpdir = 'data'
-    return tmpdir
+    # tmpdir = './data'
+    return str(tmpdir)
+
+
+@pytest.fixture
+def dataset(data_path):
+    return hydra.utils.DictConfig({
+        'name': 'MNIST',
+        'path': data_path,
+    })

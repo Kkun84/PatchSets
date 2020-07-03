@@ -1,14 +1,16 @@
 defaults:
   - optimizer: Adam
   - lr_scheduler: Step
+  - dataset: MNIST
 
 name: ''
 experiment_name: 'Default'
-seed: ~
+seed: 0
+cudnn_deterministic: False
 
 hparams:
   batch_size: 1024
-  num_workers: 4
+  num_workers: 1
   lr: 0.001
   train_patch_n: [1, 2, 4, 8, 16, 32]
   test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128]
