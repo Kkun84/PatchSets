@@ -1,0 +1,69 @@
+// For format details, see https://aka.ms/vscode-remote/devcontainer.json or this file's README at:
+// https://github.com/microsoft/vscode-dev-containers/tree/v0.122.1/containers/docker-existing-dockerfile
+{
+	"name": "Existing Dockerfile",
+
+	// Sets the run context to one level up instead of the .devcontainer folder.
+	"context": "..",
+
+	// Update the 'dockerFile' property if you aren't using the standard 'Dockerfile' filename.
+	"dockerFile": "../Dockerfile",
+
+	// Set *default* container specific settings.json values on container create.
+	"settings": {
+		"terminal.integrated.shell.linux": null
+	},
+
+	// Add the IDs of extensions you want installed when the container is created.
+	"extensions": [
+		"cssho.vscode-svgviewer",
+		"karigari.chat",
+		"ms-vsliveshare.vsliveshare-audio",
+		"streetsidesoftware.code-spell-checker",
+		"davidanson.vscode-markdownlint",
+		"mechatroner.rainbow-csv",
+		"ms-vsliveshare.vsliveshare-pack",
+		"tomoki1207.pdf",
+		"donjayamanne.githistory",
+		"ms-ceintl.vscode-language-pack-ja",
+		"njpwerner.autodocstring",
+		"visualstudioexptteam.vscodeintellicode",
+		"eamodio.gitlens",
+		"ms-python.python",
+		"redhat.vscode-yaml",
+		"yzhang.markdown-all-in-one",
+		"esbenp.prettier-vscode",
+		"ms-vsliveshare.vsliveshare",
+		"slevesque.vscode-hexdump"
+	],
+
+	// Use 'forwardPorts' to make a list of ports inside the container available locally.
+	// "forwardPorts": [],
+
+	// Uncomment the next line to run commands after the container is created - for example installing curl.
+	// "postCreateCommand": "apt-get update && apt-get install -y curl",
+
+	// Uncomment when using a ptrace-based debugger like C++, Go, and Rust
+	// "runArgs": [ "--cap-add=SYS_PTRACE", "--security-opt", "seccomp=unconfined" ],
+
+	// Uncomment to use the Docker CLI from inside the container. See https://aka.ms/vscode-remote/samples/docker-from-docker.
+	// "mounts": [ "source=/var/run/docker.sock,target=/var/run/docker.sock,type=bind" ],
+
+	// Uncomment to connect as a non-root user. See https://aka.ms/vscode-remote/containers/non-root.
+	// "remoteUser": "vscode"
+
+	"runArgs": [
+		"-p6006-6007:6006-6007",
+		"-p5000-5001:5000-5001",
+		"-p8888-8889:8888-8889",
+		"--gpus=all",
+		"-eTZ=Asia/Tokyo",
+		"--volume=${localEnv:HOME}/dataset:/dataset",
+	],
+
+	"postCreateCommand": "\
+		echo fs.inotify.max_user_watches=524288 >> /etc/sysctl.conf & \
+		mlflow server --default-artifact-root=gs://YOUR_GCS_BUCKET/path/to/mlruns --host=0.0.0.0 --port=5000 & \
+		tensorboard --logdir=. --host=0.0.0.0 --port=6006 & \
+	"
+}
