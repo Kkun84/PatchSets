@@ -43,7 +43,9 @@ def main(config):
 
     if config.loggers is not None:
         logger.info('Setting logger.')
-        trainer_params['logger'] = [hydra.utils.instantiate(i) for i in config.loggers]
+        loggers = [hydra.utils.instantiate(i) for i in config.loggers]
+        logger.info(f"loggers={loggers}")
+        trainer_params['logger'] = loggers
 
     if config.callback.checkpoint is not None:
         logger.info('Setting checkpoint_callback.')
@@ -55,7 +57,9 @@ def main(config):
 
     if config.callback.callbacks is not None:
         logger.info('Setting callbacks.')
-        trainer_params['callbacks'] = [hydra.utils.instantiate(i) for i in config.callback.callbacks]
+        callbacks = [hydra.utils.instantiate(i) for i in config.callback.callbacks]
+        logger.info(f"callbacks={callbacks}")
+        trainer_params['callbacks'] = callbacks
 
     trainer = pl.Trainer(
         **config.trainer,
