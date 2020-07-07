@@ -22,5 +22,7 @@ RUN apt-get update && apt-get install -y fish nano git
 
 ENV PYTHONPATH ${PYTONPATH}:"./"
 
-EXPOSE 22
-CMD ["/usr/sbin/sshd", "-D"]
+# RUN mkdir /dataset
+
+# EXPOSE 22
+# CMD ["/usr/sbin/sshd", "-D"]
