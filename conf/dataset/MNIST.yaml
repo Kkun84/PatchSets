@@ -1,0 +1,7 @@
+dataset:
+  name: MNIST
+  params:
+    root: '/dataset/'
+  transform:
+    - class: torchvision.transforms.ToTensor
+  target_transform: ~
