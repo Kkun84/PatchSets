@@ -1,20 +1,24 @@
 defaults:
   - optimizer: Adam
-  - lr_scheduler: Step
+  - lr_scheduler: ~
+  - dataset: MNIST
 
 name: ''
-experiment_name: 'Default'
-seed: ~
+experiment_name: Default
 
 hparams:
   batch_size: 1024
-  num_workers: 4
+  num_workers: 6
   lr: 0.001
   train_patch_n: [1, 2, 4, 8, 16, 32]
   test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128]
-  patch_size: 8
+  patch_size: 5
   latent_dim: 64
   n_pow: 1
+  dataset_n_splits: 5
+  dataset_n: 0
+  early_stopping: 100
+  seed: 0
 
 model_params:
   encoder:
@@ -34,12 +38,12 @@ model_params:
 
 optim:
   optimizer: ${optimizer}
-  # lr_scheduler: ${lr_scheduler}
   lr_scheduler: ~
 
 trainer:
   gpus: 1
   num_nodes: 1
+  deterministic: False
 
 callback:
   checkpoint:
@@ -55,7 +59,7 @@ callback:
     params:
       monitor: val_loss
       min_delta: 0
-      patience: 100
+      patience: ${hparams.early_stopping}
       verbose: False
       mode: auto
   callbacks:

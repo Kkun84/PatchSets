@@ -37,8 +37,8 @@ def test_Decoder(batch_size, model_params):
     return
 
 
-def test_Model(model_params, hparams, optim, data_path, batch):
-    model = Model(model_params, hparams, optim, data_path)
+def test_Model(model_params, hparams, optim, dataset, batch):
+    model = Model(model_params, hparams, optim, dataset)
     assert hasattr(model, 'input_n')
     assert hasattr(model, 'output_n')
 
