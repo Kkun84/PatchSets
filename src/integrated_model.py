@@ -10,7 +10,7 @@ from torchvision import transforms
 import pytorch_lightning as pl
 
 from src.patch import make_patch2d
-from model import Encoder, Decoder
+from src.model import Encoder, Decoder
 
 
 logger = getLogger(__name__)

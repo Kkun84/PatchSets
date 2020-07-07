@@ -5,22 +5,14 @@ import numpy as np
 import torch
 import torchvision
 import pytorch_lightning as pl
-from sklearn.model_selection import StratifiedKFold
 
-from dataset import get_dataset
-from model import Encoder, Decoder
-from integrated_model import IntegratedModel
+from src.dataset import get_dataset
+from src.model import Encoder, Decoder
+from src.integrated_model import IntegratedModel
+from src.dataset import split_datset
 
 
 logger = getLogger(__name__)
-
-
-def split_datset(dataset, n_splits, n):
-    kf = StratifiedKFold(n_splits=n_splits, shuffle=True, random_state=0)
-    train_index, valid_index = list(kf.split(*zip(*dataset)))[n]
-    train = torch.utils.data.Subset(dataset, train_index)
-    valid = torch.utils.data.Subset(dataset, valid_index)
-    return train, valid
 
 
 @hydra.main(config_path='../conf/config.yaml')
