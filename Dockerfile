@@ -20,7 +20,7 @@ RUN pip install -r /requirements.txt
 # Install fish
 RUN apt-get update && apt-get install -y fish nano git
 
-ENV PYTHONPATH "${PYTONPATH}:/workspace"
+ENV PYTHONPATH ${PYTONPATH}:"./"
 
 EXPOSE 22
 CMD ["/usr/sbin/sshd", "-D"]
