@@ -12,12 +12,12 @@ hparams:
   lr: 0.001
   train_patch_n: [1, 2, 4, 8, 16, 32]
   test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128]
-  patch_size: 5
+  patch_size: 7
   latent_dim: 64
   n_pow: 1
   dataset_n_splits: 5
   dataset_n: 0
-  early_stopping: 100
+  early_stopping: 50
   seed: 0
 
 model_params:

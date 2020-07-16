@@ -1,0 +1,8 @@
+dataset:
+  name: AdobeFontCharImages
+  params:
+    root: '/dataset/'
+  transform:
+    - class: torchvision.transforms.ToTensor
+  target_transform:
+    - class: src.dataset.adobe_font_charImages.ExtractAlphabet
