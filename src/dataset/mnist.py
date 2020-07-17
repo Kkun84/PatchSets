@@ -9,16 +9,17 @@ from logging import getLogger
 logger = getLogger(__name__)
 
 
-def MNIST(root, transform=None, target_transform=None):
+def mnist(root, transform=None, target_transform=None):
     logger.debug('MNIST({}, {}, {})'.format(root, transform, target_transform))
-    train = MNISTdataset(root=root, type_='train', transform=transform, target_transform=target_transform)
-    test = MNISTdataset(root=root, type_='test', transform=transform, target_transform=target_transform)
+    train = MNIST(root=root, type_='train', transform=transform, target_transform=target_transform)
+    test = MNIST(root=root, type_='test', transform=transform, target_transform=target_transform)
     return train, test
 
 
-class MNISTdataset(torch.utils.data.Dataset):
+class MNIST(torch.utils.data.Dataset):
     def __init__(self, root, type_, transform=None, target_transform=None):
-        logger.debug('MNISTdataset({}, {}, {}, {})'.format(root, type_, transform, target_transform))
+        logger.debug('MNIST({}, {}, {}, {})'.format(root, type_, transform, target_transform))
+        assert type_ in ['train', 'test']
         self.transform = transform
         self.target_transform = target_transform
         self.root = Path(root) / 'MNIST'

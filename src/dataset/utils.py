@@ -3,8 +3,8 @@ import torch
 import pytorch_lightning as pl
 from sklearn.model_selection import StratifiedKFold
 
-from . import mnist
-from . import adobe_font_charImages
+# from . import mnist
+# from . import adobe_font_charImages
 
 
 logger = getLogger(__name__)
@@ -19,9 +19,9 @@ def split_dataset(dataset, n_splits, n):
     logger.debug(f"len(valid)={len(valid)}")
     return train, valid
 
-def get_dataset(name):
-    if name == 'MNIST':
-        return mnist.MNIST
-    elif name == 'AdobeFontCharImages':
-        return adobe_font_charImages.AdobeFontCharImages
-    assert False, f"Not found dataset {name}."
+# def get_dataset(name):
+#     if name == 'MNIST':
+#         return mnist.MNIST
+#     elif name == 'AdobeFontCharImages':
+#         return adobe_font_charImages.AdobeFontCharImages
+#     assert False, f"Not found dataset {name}."

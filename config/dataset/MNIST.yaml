@@ -1,10 +1,7 @@
 dataset:
-  class: src.dataset.MNIST
+  class: src.dataset.mnist
   params:
     root: '/dataset/'
-train_transform:
+transform:
   - class: torchvision.transforms.ToTensor
-train_target_transform: ~
-test_transform:
-  - class: torchvision.transforms.ToTensor
-test_target_transform: ~
+target_transform: ~

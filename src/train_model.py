@@ -8,7 +8,7 @@ import os.path
 
 from src.model import Encoder, Decoder
 from src.integrated_model import IntegratedModel
-from src.dataset import split_dataset, get_dataset
+from src.dataset import split_dataset
 
 
 logger = getLogger(__name__)
@@ -23,14 +23,12 @@ def main(config):
     encoder = Encoder(**config.model_params.encoder)
     decoder = Decoder(**config.model_params.decoder)
 
-    train_transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.train_transform]) if config.train_transform else None
-    train_target_transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.train_target_transform]) if config.train_target_transform else None
-    test_transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.test_transform]) if config.test_transform else None
-    test_target_transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.test_target_transform]) if config.test_target_transform else None
+    transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.transform]) if config.transform else None
+    target_transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.target_transform]) if config.target_transform else None
 
     tmp_dataset, test_dataset = hydra.utils.instantiate(config.dataset)
-    tmp_dataset.set_transform(train_transform, train_target_transform)
-    test_dataset.set_transform(test_transform, test_target_transform)
+    tmp_dataset.set_transform(transform, target_transform)
+    test_dataset.set_transform(transform, target_transform)
 
     dataset = *split_dataset(tmp_dataset, config.hparams.dataset_n_splits, config.hparams.dataset_n), test_dataset
 
