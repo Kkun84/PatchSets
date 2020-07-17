@@ -1,10 +1,10 @@
 from logging import getLogger
 import hydra
-import random
 import numpy as np
 import torch
 import torchvision
 import pytorch_lightning as pl
+import os.path
 
 from src.model import Encoder, Decoder
 from src.integrated_model import IntegratedModel
@@ -14,7 +14,7 @@ from src.dataset import split_dataset, get_dataset
 logger = getLogger(__name__)
 
 
-@hydra.main(config_path='../conf/config.yaml')
+@hydra.main(config_path='../config/config.yaml')
 def main(config):
     logger.info(f"\n{config.pretty()}")
 
@@ -25,12 +25,8 @@ def main(config):
 
     transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.dataset.transform]) if config.dataset.transform else None
     target_transform = torchvision.transforms.Compose([hydra.utils.instantiate(i) for i in config.dataset.target_transform]) if config.dataset.target_transform else None
-    print(config.dataset.params)
-    print(len(config.dataset.params))
-    print(transform)
-    print(target_transform)
-    print(len(dict(**config.dataset.params, transform=transform, target_transform=target_transform)))
-    tmp_dataset, test_dataset = get_dataset(config.dataset.name)(**config.dataset.params, transform=transform, target_transform=target_transform)
+    tmp_dataset, test_dataset = get_dataset(config.dataset.name)(
+        root=os.path.expanduser(config.dataset.root), transform=transform, target_transform=target_transform)
     dataset = *split_dataset(tmp_dataset, config.hparams.dataset_n_splits, config.hparams.dataset_n), test_dataset
 
     model = IntegratedModel(config.hparams, encoder, decoder, config.optim, dataset)

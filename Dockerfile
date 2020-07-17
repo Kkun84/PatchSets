@@ -27,8 +27,8 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 
 ENV PYTHONPATH ${PYTONPATH}:"./"
 
-RUN chmod 777 /root
-ENV HOME /root
+RUN chmod 777 "/root"
+ENV HOME "/root"
 
 # RUN mkdir /dataset
 

@@ -10,6 +10,7 @@ mlflow==1.8.0
 more-itertools==8.3.0
 notebook==6.0.3
 numpy==1.18.1
+omegaconf==1.4.1
 opencv-python==4.2.0.34
 pandas==1.0.4
 Pillow==7.0.0

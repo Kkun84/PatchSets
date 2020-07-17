@@ -1,7 +1,6 @@
 dataset:
   name: AdobeFontCharImages
-  params:
-    root: '/dataset/'
+  root: '/dataset/'
   transform:
     - class: torchvision.transforms.ToTensor
   target_transform:

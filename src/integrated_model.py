@@ -80,7 +80,8 @@ class IntegratedModel(pl.LightningModule):
         loss = []
         for patch_n in self.hparams.train_patch_n:
             x, y = batch
-            y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
+            patch = make_patch2d(x, self.hparams.patch_size, patch_n)
+            y_hat = self(patch)
             loss.append(F.cross_entropy(y_hat, y))
         total_loss = sum(loss) / len(loss)
         metrics = {f"train_loss_{n:03}": l for l, n in zip(loss, self.hparams.train_patch_n)}
@@ -93,7 +94,8 @@ class IntegratedModel(pl.LightningModule):
         correct = []
         for patch_n in self.hparams.test_patch_n:
             x, y = batch
-            y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
+            patch = make_patch2d(x, self.hparams.patch_size, patch_n)
+            y_hat = self(patch)
             loss.append(F.cross_entropy(y_hat, y, reduction='sum'))
             correct.append((y == y_hat.argmax(1)).float())
         return {'sum_loss': loss, 'correct': correct}
@@ -120,7 +122,8 @@ class IntegratedModel(pl.LightningModule):
         correct = []
         for patch_n in self.hparams.test_patch_n:
             x, y = batch
-            y_hat = self(make_patch2d(x, self.hparams.patch_size, patch_n))
+            patch = make_patch2d(x, self.hparams.patch_size, patch_n)
+            y_hat = self(patch)
             loss.append(F.cross_entropy(y_hat, y, reduction='sum'))
             correct.append((y == y_hat.argmax(1)).float())
         return {'sum_loss': loss, 'correct': correct}
