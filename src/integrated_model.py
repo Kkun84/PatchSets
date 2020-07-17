@@ -19,7 +19,7 @@ logger = getLogger(__name__)
 class IntegratedModel(pl.LightningModule):
 
     def __init__(self, hparams, encoder, decoder, optim, dataset):
-        logger.debug(f"Model.__init__(), hparams={hparams}, optim={optim}, dataset={dataset}")
+        logger.debug('Model({}, {}, {}, {}, {})'.format(hparams, encoder, decoder, optim, dataset))
         super().__init__()
         self.hparams = argparse.Namespace(**hparams)
         self.optim = optim
@@ -32,6 +32,7 @@ class IntegratedModel(pl.LightningModule):
         self.output_n = self.decoder.output_n
 
     def forward(self, input):
+        logger.debug('forward({})'.format(input))
         logger.debug(f"input.shape={input.shape}")
         z = self.encoder(input)
         logger.debug(f"z.shape={z.shape}")
@@ -40,7 +41,7 @@ class IntegratedModel(pl.LightningModule):
         return output
 
     def configure_optimizers(self):
-        logger.info('configure_optimizers')
+        logger.debug('configure_optimizers()')
         optimizer = hydra.utils.instantiate(self.optim.optimizer, self.parameters())
         if self.optim.lr_scheduler is None:
             return [optimizer], []
@@ -48,7 +49,7 @@ class IntegratedModel(pl.LightningModule):
         return [optimizer], [lr_scheduler]
 
     def prepare_data(self):
-        logger.info('prepare_data')
+        logger.debug('prepare_data()')
         if isinstance(self.dataset, dict):
             self.train_dataset = self.dataset['train']
             self.val_dataset = self.dataset['valid']
@@ -58,24 +59,25 @@ class IntegratedModel(pl.LightningModule):
         return
 
     def train_dataloader(self):
-        logger.debug('train_dataloader')
+        logger.debug('train_dataloader()')
         batch_size = self.hparams.batch_size
         num_workers = self.hparams.num_workers
         return DataLoader(self.train_dataset, batch_size=batch_size, num_workers=num_workers, shuffle=True)
 
     def val_dataloader(self):
-        logger.debug('val_dataloader')
+        logger.debug('val_dataloader()')
         batch_size = self.hparams.batch_size
         num_workers = self.hparams.num_workers
         return DataLoader(self.val_dataset, batch_size=batch_size, num_workers=num_workers)
 
     def test_dataloader(self):
-        logger.debug('test_dataloader')
+        logger.debug('test_dataloader()')
         batch_size = self.hparams.batch_size
         num_workers = self.hparams.num_workers
         return DataLoader(self.test_dataset, batch_size=batch_size, num_workers=num_workers)
 
     def training_step(self, batch, batch_idx):
+        logger.debug('training_step({}, {})'.format(batch, batch_idx))
         logger.debug(f'training_step-{batch_idx}')
         loss = []
         for patch_n in self.hparams.train_patch_n:
@@ -89,6 +91,7 @@ class IntegratedModel(pl.LightningModule):
         return {'loss': total_loss, 'log': metrics}
 
     def validation_step(self, batch, batch_idx):
+        logger.debug('validation_step({}, {})'.format(batch, batch_idx))
         logger.debug(f'validation_step-{batch_idx}')
         loss = []
         correct = []
@@ -101,7 +104,7 @@ class IntegratedModel(pl.LightningModule):
         return {'sum_loss': loss, 'correct': correct}
 
     def validation_epoch_end(self, outputs):
-        logger.debug('validation_epoch_end')
+        logger.debug('validation_epoch_end({})'.format(outputs))
         loss = []
         accuracy = []
         for patch_n_i in range(len(self.hparams.test_patch_n)):
@@ -117,7 +120,7 @@ class IntegratedModel(pl.LightningModule):
         return {'val_loss': total_loss, 'log': metrics}
 
     def test_step(self, batch, batch_idx):
-        logger.info(f'test_step-{batch_idx}')
+        logger.debug('test_step({}, {})'.format(batch, batch_idx))
         loss = []
         correct = []
         for patch_n in self.hparams.test_patch_n:
@@ -129,7 +132,7 @@ class IntegratedModel(pl.LightningModule):
         return {'sum_loss': loss, 'correct': correct}
 
     def test_epoch_end(self, outputs):
-        logger.info('test_epoch_end')
+        logger.debug('test_epoch_end({})'.format(outputs))
         loss = []
         accuracy = []
         for patch_n_i in range(len(self.hparams.test_patch_n)):
