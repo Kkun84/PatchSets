@@ -1,5 +1,5 @@
 dataset:
-  class: src.dataset.AdobeFontCharImagess
+  class: src.dataset.AdobeFontCharImages
   params:
     root: '/dataset/'
 train_transform:
