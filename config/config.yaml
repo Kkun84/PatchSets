@@ -10,14 +10,16 @@ hparams:
   batch_size: 1024
   num_workers: 6
   lr: 0.001
-  train_patch_n: [1, 2, 4, 8, 16, 32]
-  test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128]
-  patch_size: 7
-  latent_dim: 64
+  train_patch_n: [1, 2, 4, 8, 16, 32, 64, 128, 256]
+  test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512]
+  patch_size: 15
+  latent_dim: 256
   n_pow: 1
   dataset_n_splits: 5
   dataset_n: 0
-  early_stopping: 50
+  max_epochs: 100000
+  min_epochs: 1
+  early_stopping: 200
   seed: 0
 
 model_params:
@@ -26,24 +28,27 @@ model_params:
       - 1
       - ${hparams.patch_size}
       - ${hparams.patch_size}
-    hidden_n_0: 64
-    hidden_n_1: 64
+    hidden_n_0: 256
+    hidden_n_1: 256
     output_n: ${hparams.latent_dim}
     n_pow: ${hparams.n_pow}
   decoder:
     input_n: ${hparams.latent_dim}
-    hidden_n_0: 64
-    hidden_n_1: 64
-    output_n: 10
+    hidden_n_0: 256
+    hidden_n_1: 256
+    output_n: ${dataset_output_n}
 
 optim:
   optimizer: ${optimizer}
   lr_scheduler: ~
 
 trainer:
+  max_epochs: ${hparams.max_epochs}
+  min_epochs: ${hparams.min_epochs}
   gpus: 1
   num_nodes: 1
   deterministic: False
+  weights_summary: 'full'
 
 callback:
   checkpoint:
@@ -52,7 +57,7 @@ callback:
       filepath: ~
       monitor: val_loss
       verbose: False
-      save_top_k: 3
+      save_top_k: 1
       mode: auto
   early_stopping:
     class: pytorch_lightning.callbacks.EarlyStopping

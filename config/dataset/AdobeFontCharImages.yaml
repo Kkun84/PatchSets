@@ -6,3 +6,4 @@ transform:
   - class: torchvision.transforms.ToTensor
 target_transform:
   - class: src.dataset.ExtractAlphabet
+dataset_output_n: 52

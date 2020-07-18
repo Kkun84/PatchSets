@@ -5,3 +5,4 @@ dataset:
 transform:
   - class: torchvision.transforms.ToTensor
 target_transform: ~
+dataset_output_n: 10
