@@ -56,6 +56,9 @@ class IntegratedModel(pl.LightningModule):
             self.test_dataset = self.dataset['test']
         else:
             self.train_dataset, self.val_dataset, self.test_dataset = self.dataset
+        logger.info(f'Size of training dataset: {len(self.train_dataset)}')
+        logger.info(f'Size of validation dataset: {len(self.val_dataset)}')
+        logger.info(f'Size of testing dataset: {len(self.test_dataset)}')
         return
 
     def train_dataloader(self):
