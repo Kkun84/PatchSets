@@ -1,7 +1,7 @@
 defaults:
   - optimizer: Adam
   - lr_scheduler: ~
-  - dataset: MNIST
+  - dataset: AdobeFontCharImages
 
 name: ''
 experiment_name: Default
