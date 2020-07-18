@@ -1,5 +1,6 @@
 from logging import getLogger
 import hydra
+import argparse
 import numpy as np
 import torch
 import torchvision
@@ -32,7 +33,7 @@ def main(config):
 
     dataset = *split_dataset(tmp_dataset, config.hparams.dataset_n_splits, config.hparams.dataset_n), test_dataset
 
-    model = IntegratedModel(config.hparams, encoder, decoder, config.optim, dataset)
+    model = IntegratedModel(argparse.Namespace(**config.hparams), encoder, decoder, config.optim, dataset)
 
     trainer_params = {}
 

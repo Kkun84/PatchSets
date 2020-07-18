@@ -21,7 +21,7 @@ class IntegratedModel(pl.LightningModule):
     def __init__(self, hparams, encoder, decoder, optim, dataset):
         logger.debug('Model({}, {}, {}, {}, {})'.format(hparams, encoder, decoder, optim, dataset))
         super().__init__()
-        self.hparams = argparse.Namespace(**hparams)
+        self.hparams = hparams
         self.optim = optim
         self.dataset = dataset
 
