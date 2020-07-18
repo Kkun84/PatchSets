@@ -25,7 +25,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     # curl zlib1g-dev libssl-dev libffi-dev libbz2-dev libreadline-dev libsqlite3-dev liblzma-dev libsm6 libxrender1
     libsm6 libxrender1
 
-ENV PYTHONPATH ${PYTONPATH}:"./"
+ENV PYTHONPATH ${PYTONPATH}:"/workspace/"
 
 RUN chmod 777 "/root"
 ENV HOME "/root"
