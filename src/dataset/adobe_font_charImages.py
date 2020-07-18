@@ -16,7 +16,7 @@ logger = getLogger(__name__)
 def adobe_font_char_images(root, transform=None, target_transform=None):
     dataset = AdobeFontCharImages(root, transform=None, target_transform=None)
     unique_font = range(len(dataset.unique_font))
-    train_font, test_font = train_test_split(unique_font, test_size=0.2, random_state=0)
+    train_font, test_font = train_test_split(unique_font, test_size=1/6, random_state=0)
     train_index = []
     test_index = []
     for i in range(len(dataset)):
