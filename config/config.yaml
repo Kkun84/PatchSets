@@ -19,7 +19,7 @@ hparams:
   dataset_n: 0
   max_epochs: 100000
   min_epochs: 1
-  early_stopping: 200
+  early_stopping: 50
   seed: 0
 
 model_params:
