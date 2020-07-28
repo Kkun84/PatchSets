@@ -93,7 +93,7 @@ class IntegratedModel(pl.LightningModule):
         #     total_loss = sum(loss) / len(loss)
         # else:
         #     total_loss = sum([l / patch_n**(1 - self.hparams.n_pow) for l, patch_n in zip(loss, self.hparams.train_patch_n)]) / len(loss)
-        metrics = {f"train_loss_{n:03}": l for l, n in zip(loss, self.hparams.train_patch_n)}
+        metrics = {f"train_loss_{n:05}": l for l, n in zip(loss, self.hparams.train_patch_n)}
         metrics["train_loss"] = total_loss
         return {'loss': total_loss, 'log': metrics}
 
@@ -125,8 +125,8 @@ class IntegratedModel(pl.LightningModule):
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
             **{'val_loss': total_loss, 'val_acc': total_accuracy},
-            **{f"val_loss_{n:03}": l for l, n in zip(loss, self.hparams.test_patch_n)},
-            **{f"val_acc_{n:03}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
+            **{f"val_loss_{n:05}": l for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"val_acc_{n:05}": a for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
         return {'val_loss': total_loss, 'log': metrics}
 
@@ -157,8 +157,8 @@ class IntegratedModel(pl.LightningModule):
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
             **{'test_loss': total_loss.item(), 'test_acc': total_accuracy.item()},
-            **{f"test_loss_{n:03}": l.item() for l, n in zip(loss, self.hparams.test_patch_n)},
-            **{f"test_acc_{n:03}": a.item() for a, n in zip(accuracy, self.hparams.test_patch_n)}
+            **{f"test_loss_{n:05}": l.item() for l, n in zip(loss, self.hparams.test_patch_n)},
+            **{f"test_acc_{n:05}": a.item() for a, n in zip(accuracy, self.hparams.test_patch_n)}
         )
         self.log_metrics(metrics, self.global_step)
         logger.info(metrics)
