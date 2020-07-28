@@ -36,8 +36,8 @@ class Encoder(pl.LightningModule):
         logger.debug([input.shape[0]*input.shape[1], self.input_n])
         x = input.reshape([input.shape[0]*input.shape[1], self.input_n])
         logger.debug(f"reshape-x.shape={x.shape}")
-        x = self.fc0(x).relu(x)
-        x = self.fc1(x).relu(x)
+        x = self.fc0(x).relu()
+        x = self.fc1(x).relu()
         x = self.fc2(x)
         logger.debug(f"linear-x.shape={x.shape}")
         x = x.reshape([input.shape[0], input.shape[1], self.output_n])
@@ -66,8 +66,8 @@ class Decoder(pl.LightningModule):
         # [batch, lattent]
         logger.debug(f"input.shape={input.shape}")
         x = input.tanh()
-        x = self.fc0(x).relu(x)
-        x = self.fc1(x).relu(x)
+        x = self.fc0(x).relu()
+        x = self.fc1(x).relu()
         x = self.fc2(x)
         logger.debug(f"linear-x.shape={x.shape}")
         return x
