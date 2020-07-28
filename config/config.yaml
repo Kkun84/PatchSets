@@ -50,7 +50,10 @@ trainer:
   gpus: 1
   num_nodes: 1
   deterministic: False
-  weights_summary: 'full'
+  weights_summary: full
+  fast_dev_run: ${debug}
+  track_grad_norm: -1
+  log_gpu_memory: ~
 
 callback:
   checkpoint:
