@@ -3,8 +3,9 @@ defaults:
   - lr_scheduler: ~
   - dataset: AdobeFontCharImages
 
-name: ''
+project_name: PatchSets
 experiment_name: Default
+debug: False
 
 hparams:
   batch_size: 1024
