@@ -12,7 +12,7 @@ logger = getLogger(__name__)
 
 
 def adobe_font_char_images(root, transform=None, target_transform=None, upper=True, lower=True):
-    dataset = AdobeFontCharImages(root, transform=None, target_transform=None)
+    dataset = AdobeFontCharImages(root, transform, target_transform, upper, lower)
     unique_font = range(len(dataset.unique_font))
     train_font, test_font = train_test_split(unique_font, test_size=1/6, random_state=0)
     train_index = []
@@ -25,13 +25,13 @@ def adobe_font_char_images(root, transform=None, target_transform=None, upper=Tr
             test_index.append(i)
         else:
             assert False
-    train = AdobeFontCharImages(root, train_index, transform, target_transform, upper, lower)
-    test = AdobeFontCharImages(root, test_index, transform, target_transform, upper, lower)
+    train = AdobeFontCharImages(root, transform, target_transform, upper, lower, train_index)
+    test = AdobeFontCharImages(root, transform, target_transform, upper, lower, test_index)
     return train, test
 
 
 class AdobeFontCharImages(torch.utils.data.Dataset):
-    def __init__(self, root, subset_index=None, transform=None, target_transform=None, upper=True, lower=True):
+    def __init__(self, root, transform=None, target_transform=None, upper=True, lower=True, subset_index=None):
         logger.debug(f'AdobeFontCharImages({root}, {transform}, {target_transform})')
         self.transform = transform
         self.target_transform = target_transform
@@ -84,11 +84,11 @@ class ExtractAlphabet:
 
 if __name__ == "__main__":
     root = '/dataset'
-    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=True, lower=True)
+    dataset = AdobeFontCharImages(root=root, transform=None, target_transform=None, upper=True, lower=True, subset_index=None)
     print(len(dataset), dataset.unique_alphabet)
-    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=True, lower=False)
+    dataset = AdobeFontCharImages(root=root, transform=None, target_transform=None, upper=True, lower=False, subset_index=None)
     print(len(dataset), dataset.unique_alphabet)
-    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=False, lower=True)
+    dataset = AdobeFontCharImages(root=root, transform=None, target_transform=None, upper=False, lower=True, subset_index=None)
     print(len(dataset), dataset.unique_alphabet)
-    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=False, lower=False)
+    dataset = AdobeFontCharImages(root=root, transform=None, target_transform=None, upper=False, lower=False, subset_index=None)
     print(len(dataset), dataset.unique_alphabet)

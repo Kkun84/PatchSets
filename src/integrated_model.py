@@ -114,7 +114,7 @@ class IntegratedModel(pl.LightningModule):
         logger.debug('validation_epoch_end({})'.format(outputs))
         loss = []
         accuracy = []
-        for patch_n_i in range(len(self.hparams.test_patch_n)):
+        for patch_n_i in range(len(self.hparams.valid_patch_n)):
             loss.append(torch.stack([x['sum_loss'][patch_n_i] for x in outputs]).sum() / len(self.val_dataset))
             accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
         total_loss = sum(loss) / len(loss)
