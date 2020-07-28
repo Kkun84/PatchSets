@@ -102,7 +102,7 @@ class IntegratedModel(pl.LightningModule):
         logger.debug(f'validation_step-{batch_idx}')
         loss = []
         correct = []
-        for patch_n in self.hparams.test_patch_n:
+        for patch_n in self.hparams.valid_patch_n:
             x, y = batch
             patch = make_patch2d(x, self.hparams.patch_size, patch_n)
             y_hat = self(patch)
