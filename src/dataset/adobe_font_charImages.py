@@ -7,13 +7,11 @@ import torch
 from PIL import Image
 from sklearn.model_selection import train_test_split
 
-from .utils import split_dataset
-
 
 logger = getLogger(__name__)
 
 
-def adobe_font_char_images(root, transform=None, target_transform=None):
+def adobe_font_char_images(root, transform=None, target_transform=None, upper=True, lower=True):
     dataset = AdobeFontCharImages(root, transform=None, target_transform=None)
     unique_font = range(len(dataset.unique_font))
     train_font, test_font = train_test_split(unique_font, test_size=1/6, random_state=0)
@@ -27,13 +25,13 @@ def adobe_font_char_images(root, transform=None, target_transform=None):
             test_index.append(i)
         else:
             assert False
-    train = AdobeFontCharImages(root, train_index, transform, target_transform)
-    test = AdobeFontCharImages(root, test_index, transform, target_transform)
+    train = AdobeFontCharImages(root, train_index, transform, target_transform, upper, lower)
+    test = AdobeFontCharImages(root, test_index, transform, target_transform, upper, lower)
     return train, test
 
 
 class AdobeFontCharImages(torch.utils.data.Dataset):
-    def __init__(self, root, subset_index=None, transform=None, target_transform=None):
+    def __init__(self, root, subset_index=None, transform=None, target_transform=None, upper=True, lower=True):
         logger.debug(f'AdobeFontCharImages({root}, {transform}, {target_transform})')
         self.transform = transform
         self.target_transform = target_transform
@@ -41,6 +39,10 @@ class AdobeFontCharImages(torch.utils.data.Dataset):
         root = Path(root) / 'AdobeFontCharImages'
         self.unique_font = sorted([i.name for i in (root / 'font').iterdir()])
         self.unique_alphabet = sorted([i.name for i in (root / 'alphabet').iterdir()])
+        if upper == False:
+            self.unique_alphabet = [i for i in self.unique_alphabet if i[:3] != 'cap']
+        if lower == False:
+            self.unique_alphabet = [i for i in self.unique_alphabet if i[:5] != 'small']
 
         file_format = '{root}/font/{font}/{alphabet}_{font}.png'.format
         self.data = []
@@ -79,3 +81,14 @@ class ExtractFont:
 class ExtractAlphabet:
     def __call__(self, y):
         return y['alphabet']
+
+if __name__ == "__main__":
+    root = '/dataset'
+    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=True, lower=True)
+    print(len(dataset), dataset.unique_alphabet)
+    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=True, lower=False)
+    print(len(dataset), dataset.unique_alphabet)
+    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=False, lower=True)
+    print(len(dataset), dataset.unique_alphabet)
+    dataset = AdobeFontCharImages(root=root, subset_index=None, transform=None, target_transform=None, upper=False, lower=False)
+    print(len(dataset), dataset.unique_alphabet)
