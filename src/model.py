@@ -69,7 +69,7 @@ class Decoder(pl.LightningModule):
     def forward(self, input):
         # [batch, lattent]
         logger.debug(f"input.shape={input.shape}")
-        x = self.linear_0(input)
+        x = self.linear_0(input.tanh())
         x = F.relu(x)
         x = self.linear_1(x)
         x = F.relu(x)
