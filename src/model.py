@@ -17,6 +17,7 @@ logger = getLogger(__name__)
 class Encoder(pl.LightningModule):
 
     def __init__(self, input_shape, hidden_n_0, hidden_n_1, output_n, n_pow):
+    # def __init__(self, input_shape, hidden_n_0, output_n, n_pow):
         logger.debug(f"Encoder.__init__()")
         super().__init__()
         self.hparams = {}
@@ -28,6 +29,7 @@ class Encoder(pl.LightningModule):
         self.linear_0 = torch.nn.Linear(self.input_n, hidden_n_0)
         self.linear_1 = torch.nn.Linear(hidden_n_0, hidden_n_1)
         self.linear_2 = torch.nn.Linear(hidden_n_1, output_n)
+        # self.linear_1 = torch.nn.Linear(hidden_n_0, output_n)
 
     def forward(self, input):
         # [batch, sets, channels, x, y]
@@ -52,6 +54,7 @@ class Encoder(pl.LightningModule):
 class Decoder(pl.LightningModule):
 
     def __init__(self, input_n, hidden_n_0, hidden_n_1, output_n):
+    # def __init__(self, input_n, hidden_n_0, output_n):
         logger.debug(f"Decoder.__init__()")
         super().__init__()
         self.hparams = {}
@@ -61,6 +64,7 @@ class Decoder(pl.LightningModule):
         self.linear_0 = torch.nn.Linear(input_n, hidden_n_0)
         self.linear_1 = torch.nn.Linear(hidden_n_0, hidden_n_1)
         self.linear_2 = torch.nn.Linear(hidden_n_1, output_n)
+        # self.linear_1 = torch.nn.Linear(hidden_n_0, output_n)
 
     def forward(self, input):
         # [batch, lattent]
