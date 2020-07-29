@@ -89,10 +89,6 @@ class IntegratedModel(pl.LightningModule):
             y_hat = self(patch)
             loss.append(F.cross_entropy(y_hat, y))
         total_loss = sum(loss) / len(loss)
-        # if self.hparams.n_pow == 1:
-        #     total_loss = sum(loss) / len(loss)
-        # else:
-        #     total_loss = sum([l / patch_n**(1 - self.hparams.n_pow) for l, patch_n in zip(loss, self.hparams.train_patch_n)]) / len(loss)
         metrics = {f"train_loss_{n:05}": l for l, n in zip(loss, self.hparams.train_patch_n)}
         metrics["train_loss"] = total_loss
         return {'loss': total_loss, 'log': metrics}
@@ -118,10 +114,6 @@ class IntegratedModel(pl.LightningModule):
             loss.append(torch.stack([x['sum_loss'][patch_n_i] for x in outputs]).sum() / len(self.val_dataset))
             accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
         total_loss = sum(loss) / len(loss)
-        # if self.hparams.n_pow == 1:
-        #     total_loss = sum(loss) / len(loss)
-        # else:
-        #     total_loss = sum([l / patch_n**(1 - self.hparams.n_pow) for l, patch_n in zip(loss, self.hparams.train_patch_n)]) / len(loss)
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
             **{'val_loss': total_loss, 'val_acc': total_accuracy},
@@ -150,10 +142,6 @@ class IntegratedModel(pl.LightningModule):
             loss.append(torch.stack([x['sum_loss'][patch_n_i] for x in outputs]).sum() / len(self.test_dataset))
             accuracy.append(torch.cat([x['correct'][patch_n_i] for x in outputs]).mean())
         total_loss = sum(loss) / len(loss)
-        # if self.hparams.n_pow == 1:
-        #     total_loss = sum(loss) / len(loss)
-        # else:
-        #     total_loss = sum([l / patch_n**(1 - self.hparams.n_pow) for l, patch_n in zip(loss, self.hparams.train_patch_n)]) / len(loss)
         total_accuracy = sum(accuracy) / len(accuracy)
         metrics = dict(
             **{'test_loss': total_loss.item(), 'test_acc': total_accuracy.item()},
