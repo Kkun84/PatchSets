@@ -1,12 +1,9 @@
 from logging import getLogger
 import hydra
-import argparse
-import numpy as np
 import torch
 from torch.nn import functional as F
-from torch.utils.data import DataLoader, random_split
+from torch.utils.data import DataLoader
 from torchvision.datasets import MNIST
-from torchvision import transforms
 import pytorch_lightning as pl
 
 from src.patch import make_patch2d
