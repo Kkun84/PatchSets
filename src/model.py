@@ -40,7 +40,7 @@ class Encoder(pl.LightningModule):
         logger.debug(f"linear-x.shape={x.shape}")
         x = x.reshape([input.shape[0], input.shape[1], self.output_n])
         logger.debug(f"reshape-x.shape={x.shape}")
-        # [batch, lattent]
+        # [batch, sets, lattent]
         return x
 
 
