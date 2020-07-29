@@ -17,6 +17,7 @@ hparams:
   patch_size: 15
   latent_dim: 64
   pooling_mode: sum
+  use_tanh: True
   dataset_n_splits: 5
   dataset_n: 0
   max_epochs: 100000
@@ -38,6 +39,7 @@ model_params:
     hidden_n_0: 256
     hidden_n_1: 256
     output_n: ${dataset_output_n}
+    use_tanh: ${hparams.use_tanh}
 
 optim:
   optimizer: ${optimizer}

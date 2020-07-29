@@ -46,13 +46,13 @@ class Encoder(pl.LightningModule):
 
 class Decoder(pl.LightningModule):
 
-    def __init__(self, input_n, hidden_n_0, hidden_n_1, output_n):
-    # def __init__(self, input_n, hidden_n_0, output_n):
+    def __init__(self, input_n, hidden_n_0, hidden_n_1, output_n, use_tanh):
         logger.debug(f"Decoder.__init__()")
         super().__init__()
         self.hparams = {}
         self.input_n = input_n
         self.output_n = output_n
+        self.use_tanh = use_tanh
 
         self.fc0 = torch.nn.Linear(input_n, hidden_n_0)
         self.fc1 = torch.nn.Linear(hidden_n_0, hidden_n_1)
@@ -61,7 +61,9 @@ class Decoder(pl.LightningModule):
     def forward(self, input):
         # [batch, lattent]
         logger.debug(f"input.shape={input.shape}")
-        x = input.tanh()
+        x = input
+        if self.use_tanh:
+            x = x.tanh()
         x = self.fc0(x).relu()
         x = self.fc1(x).relu()
         x = self.fc2(x)
