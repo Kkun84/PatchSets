@@ -16,6 +16,7 @@ hparams:
   test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
   patch_size: 15
   latent_dim: 64
+  pooling_mode: sum
   dataset_n_splits: 5
   dataset_n: 0
   max_epochs: 100000

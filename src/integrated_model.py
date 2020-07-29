@@ -36,9 +36,21 @@ class IntegratedModel(pl.LightningModule):
         logger.debug(f"input.shape={input.shape}")
         z = self.encoder(input)
         logger.debug(f"z.shape={z.shape}")
+        z = self.pooling(z)
         output = self.decoder(z)
         logger.debug(f"output.shape={output.shape}")
         return output
+
+    def pooling(self, x, mode=None):
+        if mode is None:
+            mode = self.hparams.pooling_mode
+        if mode == 'sum':
+            x = x.sum(1)
+        elif mode == 'mean':
+            x = x.mean(1)
+        elif mode == 'max':
+            x = x.max(1)[0]
+        return x
 
     def configure_optimizers(self):
         logger.debug('configure_optimizers()')
