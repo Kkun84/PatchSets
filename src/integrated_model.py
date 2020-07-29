@@ -25,7 +25,9 @@ class IntegratedModel(pl.LightningModule):
         self.optim = optim
         self.dataset = dataset
 
+        assert isinstance(encoder, Encoder)
         self.encoder = encoder
+        assert isinstance(decoder, Decoder)
         self.decoder = decoder
 
         self.input_n = self.encoder.input_n
