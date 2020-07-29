@@ -16,12 +16,10 @@ logger = getLogger(__name__)
 
 class Encoder(pl.LightningModule):
 
-    def __init__(self, input_shape, hidden_n_0, hidden_n_1, output_n, n_pow):
-    # def __init__(self, input_shape, hidden_n_0, output_n, n_pow):
+    def __init__(self, input_shape, hidden_n_0, hidden_n_1, output_n):
         logger.debug(f"Encoder.__init__()")
         super().__init__()
         self.hparams = {}
-        self.n_pow = n_pow
 
         self.input_n = np.prod([input_shape[i] for i in range(len(input_shape))])
         self.output_n = output_n
@@ -42,8 +40,6 @@ class Encoder(pl.LightningModule):
         logger.debug(f"linear-x.shape={x.shape}")
         x = x.reshape([input.shape[0], input.shape[1], self.output_n])
         logger.debug(f"reshape-x.shape={x.shape}")
-        x = x.sum(1) / x.shape[1] ** self.n_pow
-        logger.debug(f"mean-x.shape={x.shape}")
         # [batch, lattent]
         return x
 
