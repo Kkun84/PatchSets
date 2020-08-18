@@ -1,6 +1,7 @@
 .vscode/
 .pytest_cache/
 .ipynb_checkpoints/
+/notebook/lightning_logs/
 
 .notifier
 nohup.out
