@@ -86,7 +86,7 @@ class IntegratedModel(pl.LightningModule):
 
     def test_dataloader(self):
         logger.debug('test_dataloader()')
-        batch_size = self.hparams.batch_size
+        batch_size = min(self.hparams.batch_size, 64)
         num_workers = self.hparams.num_workers
         return DataLoader(self.test_dataset, batch_size=batch_size, num_workers=num_workers)
 
