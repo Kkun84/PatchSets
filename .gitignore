@@ -2,6 +2,9 @@
 .pytest_cache/
 .ipynb_checkpoints/
 
+.notifier
+nohup.out
+
 __pycache__/
 
 /outputs/
