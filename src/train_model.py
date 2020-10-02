@@ -1,11 +1,10 @@
 from logging import getLogger
 import hydra
 import argparse
-import numpy as np
 import torch
 import torchvision
+import glob
 import pytorch_lightning as pl
-import os.path
 
 from src.model import Encoder, Decoder
 from src.integrated_model import IntegratedModel
@@ -64,6 +63,11 @@ def main(config):
 
     logger.info('Start trainer.fit().')
     trainer.fit(model)
+
+    logger.info('Load the weight of the best score for the validation data.')
+    weight_path = glob.glob('./**/checkpoints/epoch=*.ckpt', recursive=True)
+    logger.info(f'weight_path={weight_path}')
+    model = IntegratedModel.load_from_checkpoint(weight_path[-1], hparams=argparse.Namespace(**config.hparams), encoder=encoder, decoder=decoder, optim=config.optim, dataset=dataset)
 
     logger.info('Start trainer.test().')
     trainer.test()
