@@ -20,15 +20,25 @@ RUN pip install -r /requirements.txt
 # Install fish
 RUN apt-get update && apt-get install -y --no-install-recommends fish nano git sudo curl
 
-# for OpenCV
+# OpenCV
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # curl zlib1g-dev libssl-dev libffi-dev libbz2-dev libreadline-dev libsqlite3-dev liblzma-dev libsm6 libxrender1
     libsm6 libxrender1
 
-ENV PYTHONPATH ${PYTONPATH}:"/workspace/"
+# ENV PYTHONPATH ${PYTONPATH}:"/workspace/"
 
-RUN chmod 777 "/root"
-ENV HOME "/root"
+ARG UID
+ARG GID
+ARG USER
+ARG PASSWORD
+RUN groupadd -g ${GID} ${USER}_group
+RUN useradd -m --uid=${UID} --gid=${USER}_group --groups=sudo ${USER}
+RUN echo ${USER}:${PASSWORD} | chpasswd
+RUN echo 'root:root' | chpasswd
+USER ${USER}
+
+# RUN chmod 777 "/root/"
+# ENV HOME "/root"
 
 # RUN mkdir /dataset
 
