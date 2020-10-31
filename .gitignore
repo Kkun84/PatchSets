@@ -1,13 +1,12 @@
-.vscode/
 .pytest_cache/
 .ipynb_checkpoints/
 /notebook/lightning_logs/
+/.vscode/settings.json
+
+.env
 
 .notifier
 nohup.out
 
 __pycache__/
-
-/outputs/
-/multirun/
-/mlruns/
+.ipynb_checkpoints/

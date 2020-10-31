@@ -1,0 +1,24 @@
+# @package _global_
+model_checkpoint:
+  filepath: ~
+  monitor: valid_loss
+  verbose: False
+  save_last: ~
+  save_top_k: ~
+  save_weights_only: false
+  mode: min
+  prefix: ''
+  dirpath: ~
+  filename: ~
+
+early_stopping:
+  monitor: valid_loss
+  min_delta: 0
+  patience: ${hparams.patience}
+  verbose: false
+  mode: min
+
+callbacks:
+  []
+  # - _target_: pytorch_lightning.callbacks.LearningRateMonitor
+  #   logging_interval: step

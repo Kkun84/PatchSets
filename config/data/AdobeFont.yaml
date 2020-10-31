@@ -1,0 +1,13 @@
+# @package _group_
+datamodule:
+  _target_: src.datamodule.AdobeFontDataModule
+  path: /dataset/AdobeFontCharImages
+  upper: True
+  lower: False
+  data_split_num: 5
+  data_use_num: 0
+  seed: ${hparams.seed}
+  batch_size: ${hparams.batch_size}
+  num_workers: ${hparams.num_workers}
+name: AdobeFontCharImages
+class_num: 26

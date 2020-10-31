@@ -1,97 +1,32 @@
 defaults:
-  - optimizer: Adam
-  - lr_scheduler: ~
-  - dataset: AdobeFontCharImages
+  - data: AdobeFont
+  - trainer: basic
+  - callbacks: basic
+  - loggers: basic
 
-project_name: PatchSets
+project_name: PyTorchLightningHydra
 experiment_name: Default
+
 debug: False
 
 hparams:
-  batch_size: 1024
-  num_workers: 6
-  lr: 0.001
-  train_patch_n: [1, 2, 4, 8, 16, 32, 64]
-  valid_patch_n: [1, 2, 4, 8, 16, 32, 64]
-  test_patch_n: [1, 2, 4, 8, 16, 32, 64, 128, 256, 512, 1024, 2048]
-  patch_size: 15
-  latent_dim: 64
-  pooling_mode: sum
-  use_tanh: False
-  dataset_n_splits: 5
-  dataset_n: 0
-  max_epochs: 100000
-  min_epochs: 1
-  early_stopping: 50
   seed: 0
+  batch_size: 256
+  num_workers: 6
+  max_epochs: 10000
+  min_epochs: 10
+  patience: 50
+  optimizer: Adam
+  lr: 0
+  patch_size: 15
+  hidden_n: 1024
+  output_n: ${data.class_num}
+  pool_mode: max
+  patch_num_min: 1
+  patch_num_max: 256
+  data_split_num: ${data.datamodule.data_split_num}
+  data_use_num: ${data.datamodule.data_use_num}
 
-model_params:
-  encoder:
-    input_shape:
-      - 1
-      - ${hparams.patch_size}
-      - ${hparams.patch_size}
-    hidden_n_0: 256
-    hidden_n_1: 256
-    output_n: ${hparams.latent_dim}
-  decoder:
-    input_n: ${hparams.latent_dim}
-    hidden_n_0: 256
-    hidden_n_1: 256
-    output_n: ${dataset_output_n}
-    use_tanh: ${hparams.use_tanh}
-
-optim:
-  optimizer: ${optimizer}
-  lr_scheduler: ~
-
-trainer:
-  max_epochs: ${hparams.max_epochs}
-  min_epochs: ${hparams.min_epochs}
-  gpus: 1
-  num_nodes: 1
-  deterministic: False
-  weights_summary: full
-  fast_dev_run: ${debug}
-  track_grad_norm: -1
-  log_gpu_memory: ~
-
-callback:
-  checkpoint:
-    class: pytorch_lightning.callbacks.ModelCheckpoint
-    params:
-      filepath: ~
-      monitor: val_loss
-      verbose: False
-      save_top_k: 1
-      mode: auto
-  early_stopping:
-    class: pytorch_lightning.callbacks.EarlyStopping
-    params:
-      monitor: val_loss
-      min_delta: 0
-      patience: ${hparams.early_stopping}
-      verbose: False
-      mode: auto
-  callbacks:
-    ~
-
-loggers:
-  - class: pytorch_lightning.loggers.TensorBoardLogger
-    params:
-      save_dir: '.'
-      name: ''
-      version: ''
-  - class: pytorch_lightning.loggers.MLFlowLogger
-    params:
-      experiment_name: ${experiment_name}
-      tracking_uri: "file:/workspace/mlruns"
-      tags: ~
-      save_dir: ~
-  - class: pytorch_lightning.loggers.NeptuneLogger
-    params:
-      api_key: ${env:NEPTUNE_API_TOKEN}
-      project_name: kanda/${project_name}
-      experiment_name: ${experiment_name}
-      tags: ~
-      upload_source_files: [/workspace/src, /workspace/config]
+hydra:
+  run:
+    dir: ./outputs/${experiment_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}

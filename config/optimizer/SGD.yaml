@@ -1,4 +1,0 @@
-optimizer:
-  class: torch.optim.SGD
-  params:
-    lr: ${hparams.lr}

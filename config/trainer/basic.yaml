@@ -1,0 +1,21 @@
+# @package _group_
+# https://pytorch-lightning.readthedocs.io/en/latest/trainer.html#trainer-flags
+max_epochs: ${hparams.max_epochs}
+min_epochs: ${hparams.min_epochs}
+# auto_lr_find: True
+auto_scale_batch_size: False
+gpus: 1
+auto_select_gpus: True
+num_nodes: 1
+accelerator: ~
+benchmark: True
+deterministic: True
+# gradient_clip_val: 0
+# track_grad_norm: -1
+# overfit_batches: 0
+# precision: 32
+fast_dev_run: ${debug}
+profiler: simple
+weights_summary: full
+# default_root_dir: ./abcdefg/
+# weights_save_path: ./hijklmn

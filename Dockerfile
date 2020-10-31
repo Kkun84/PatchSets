@@ -1,31 +1,22 @@
-FROM pytorch/pytorch:1.5-cuda10.1-cudnn7-runtime
+# FROM pytorch/pytorch:1.7.0-cuda11.0-cudnn8-runtime
+FROM pytorch/pytorch:1.6.0-cuda10.1-cudnn7-runtime
 
-# for Timezone setting
+# Timezone setting
 RUN apt-get update && apt-get install -y --no-install-recommends tzdata
 
-# SSH setting
-# https://docs.docker.com/engine/examples/running_ssh_service/#build-an-eg_sshd-image
-RUN apt-get update && apt-get install -y --no-install-recommends openssh-server
-RUN mkdir /var/run/sshd
-RUN echo 'root:pass' | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed -i 's/#PasswordAuthetication/PasswordAuthetication/' /etc/ssh/sshd_config
-# # SSH login fix. Otherwise user is kicked off after login
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
+# Install something
+RUN apt-get update && apt-get install -y --no-install-recommends software-properties-common
+RUN apt-add-repository -y ppa:fish-shell/release-3
+RUN apt-get update && apt-get install -y --no-install-recommends fish
+
+RUN apt-get update && apt-get install -y --no-install-recommends nano git sudo curl
+
+# OpenCV
+RUN apt-get update && apt-get install -y --no-install-recommends libopencv-dev
 
 # Install Python library
 COPY requirements.txt /
 RUN pip install -r /requirements.txt
-
-# Install fish
-RUN apt-get update && apt-get install -y --no-install-recommends fish nano git sudo curl
-
-# OpenCV
-RUN apt-get update && apt-get install -y --no-install-recommends \
-    # curl zlib1g-dev libssl-dev libffi-dev libbz2-dev libreadline-dev libsqlite3-dev liblzma-dev libsm6 libxrender1
-    libsm6 libxrender1
-
-# ENV PYTHONPATH ${PYTONPATH}:"/workspace/"
 
 ARG UID
 ARG GID
@@ -36,11 +27,3 @@ RUN useradd -m --uid=${UID} --gid=${USER}_group --groups=sudo ${USER}
 RUN echo ${USER}:${PASSWORD} | chpasswd
 RUN echo 'root:root' | chpasswd
 USER ${USER}
-
-# RUN chmod 777 "/root/"
-# ENV HOME "/root"
-
-# RUN mkdir /dataset
-
-# EXPOSE 22
-# CMD ["/usr/sbin/sshd", "-D"]

@@ -1,4 +1,0 @@
-optimizer:
-  class: torch.optim.Adam
-  params:
-    lr: ${hparams.lr}
