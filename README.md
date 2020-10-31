@@ -1,15 +1,15 @@
-# PyTorchLightningHydra
+# PatchSets
 
-[PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning)と[Hydra](https://github.com/facebookresearch/hydra)を使ったプログラム例です．
-MNISTを学習します．
+パッチ集合を入力としてクラス分類をするニューラルネットワークの研究．
+[PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning)と[Hydra](https://github.com/facebookresearch/hydra)を使っています．
 
 ## Dockerの利用
 
 Dockerに関するシェルスクリプトが`docker/`フォルダにまとめられています．
 拡張子が`.sh`のファイルを実行すれば簡単にDockerを利用できます．
 
-- `./docker/build.sh`: DockerfileからDockerイメージを作ります． Dockerイメージの名前は`PyTorchLightningHydra`です．
-- `./docker/run.sh`: Dockerイメージ`PyTorchLightningHydra`のコンテナを作ります． コンテナの名前は`pytorch_lightning_hydra`です．このシェルスクリプトを実行したディレクトリとパス`$DATASET`が示すディレクトリがそれぞれコンテナ内の`/workspace/`と`/dataset/`に**マウントされ，完全に同期されます**．また，5000,6006,8888のポートをホストに割り当てます．環境変数は`.env`ファイルから読み込みます．
+- `./docker/build.sh`: DockerfileからDockerイメージを作ります． Dockerイメージの名前は`PatchSets`です．
+- `./docker/run.sh`: Dockerイメージ`PatchSets`のコンテナを作ります． コンテナの名前は`patch_sets`です．このシェルスクリプトを実行したディレクトリとパス`$DATASET`が示すディレクトリがそれぞれコンテナ内の`/workspace/`と`/dataset/`に**マウントされ，完全に同期されます**．また，5000,6006,8888のポートをホストに割り当てます．環境変数は`.env`ファイルから読み込みます．
   -  引数: コンテナで常時実行するコマンド．デフォルトはfish
 - `./docker/attach.sh`: `run`で実行したコマンドに復帰します．このコマンドが終了するとコンテナも終了します．
 - `./docker/exec.sh`: 動作中のコンテナで新しいコマンドを実行します．
@@ -28,7 +28,8 @@ Dockerに関するシェルスクリプトが`docker/`フォルダにまとめ�
 学習のスクリプトは全て`src/`にまとめられています．
 学習するには`src/train`を実行します．
 
-ニューラルネットワークのモデルは`src/model`にまとめられています．
+ニューラルネットワークのモデルは`src/model.py`に書かれています．
+`src/set_module/`に集合を入力とするモデルを簡単に書くためのモジュールが書かれています．
 
 ### ハイパーパラメータの変更
 
