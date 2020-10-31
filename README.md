@@ -1,7 +1,7 @@
 # PyTorchLightningHydra
 
-[PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning)と[Hydra](https://github.com/facebookresearch/hydra)を使ったプログラム例です．
-MNISTを学習します．
+パッチ集合を入力としてクラス分類をするニューラルネットワークの研究．
+[PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning)と[Hydra](https://github.com/facebookresearch/hydra)を使っています．
 
 ## Dockerの利用
 
@@ -28,7 +28,8 @@ Dockerに関するシェルスクリプトが`docker/`フォルダにまとめ�
 学習のスクリプトは全て`src/`にまとめられています．
 学習するには`src/train`を実行します．
 
-ニューラルネットワークのモデルは`src/model`にまとめられています．
+ニューラルネットワークのモデルは`src/model.py`に書かれています．
+`src/set_module/`に集合を入力とするモデルを簡単に書くためのモジュールが書かれています．
 
 ### ハイパーパラメータの変更
 
