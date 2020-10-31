@@ -21,8 +21,6 @@ def main(config) -> None:
 
         datamodule = hydra.utils.instantiate(config.data.datamodule)
 
-        aaa
-
         trainer = pl.Trainer(
             **config.trainer,
             checkpoint_callback=ModelCheckpoint(**config.model_checkpoint),
