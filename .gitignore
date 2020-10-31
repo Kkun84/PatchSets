@@ -3,10 +3,9 @@
 /notebook/lightning_logs/
 /.vscode/settings.json
 
-.env
-
-.notifier
-nohup.out
+/.env
+/.notifier
+/nohup.out
 
 __pycache__/
 .ipynb_checkpoints/
