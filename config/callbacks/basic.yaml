@@ -1,6 +1,5 @@
 # @package _global_
 model_checkpoint:
-  filepath: ~
   monitor: valid_loss
   verbose: False
   save_last: ~
@@ -8,7 +7,7 @@ model_checkpoint:
   save_weights_only: false
   mode: min
   prefix: ''
-  dirpath: ~
+  dirpath: './checkpoints'
   filename: ~
 
 early_stopping:
