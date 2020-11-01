@@ -34,6 +34,8 @@ def main(config) -> None:
 
         trainer.tune(model, datamodule=datamodule)
         if config.debug == True:
+            # fast_dev_runモードではauto_lr_findが失敗し，model.hparams.lrにNoneが代入される
+            assert model.hparams.lr is None
             model.hparams.lr = 1
         assert model.hparams.lr > 0, f'model.hparams.lr > 0={model.hparams.lr > 0}'
         config.hparams.lr = model.hparams.lr
