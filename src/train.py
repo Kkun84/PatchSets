@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from logging import getLogger
 from pathlib import Path
+import torchsummary
 
 from src.model import Model
 
@@ -31,6 +32,7 @@ def main(config) -> None:
         )
 
         model = Model(**config.hparams)
+        torchsummary.summary(model)
 
         trainer.tune(model, datamodule=datamodule)
         if config.debug == True:
