@@ -51,7 +51,7 @@ def main(config) -> None:
             path = Path.cwd()
             if 'outputs' in path.parts or 'multirun' in path.parts:
                 logger.info(f'Rename directory name. "{path}" -> "{path}__interrupted"')
-                path.rename(path.parent / (path.name + '__interrupted'))
+                path.rename(path.parent / (path.name + '__interrupted__'))
 
 
 if __name__ == "__main__":
