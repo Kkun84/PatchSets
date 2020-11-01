@@ -11,6 +11,12 @@ import src.set_module as sm
 class Model(pl.LightningModule):
     def __init__(
         self,
+        patch_size: int,
+        hidden_n: int,
+        output_n: int,
+        pool_mode: str,
+        patch_num_min: int,
+        patch_num_max: int,
         seed: int,
         batch_size: int,
         num_workers: int,
@@ -19,12 +25,6 @@ class Model(pl.LightningModule):
         patience: int,
         optimizer: str,
         lr: float,
-        patch_size: int,
-        hidden_n: int,
-        output_n: int,
-        pool_mode: str,
-        patch_num_min: int,
-        patch_num_max: int,
         data_split_num: int,
         data_use_num: int,
     ):

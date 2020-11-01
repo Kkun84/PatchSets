@@ -10,6 +10,12 @@ experiment_name: Default
 debug: False
 
 hparams:
+  patch_size: 15
+  hidden_n: 1024
+  output_n: ${data.class_num}
+  pool_mode: max
+  patch_num_min: 1
+  patch_num_max: 256
   seed: 0
   batch_size: 256
   num_workers: 6
@@ -18,12 +24,6 @@ hparams:
   patience: 50
   optimizer: Adam
   lr: 0
-  patch_size: 15
-  hidden_n: 1024
-  output_n: ${data.class_num}
-  pool_mode: max
-  patch_num_min: 1
-  patch_num_max: 256
   data_split_num: ${data.datamodule.data_split_num}
   data_use_num: ${data.datamodule.data_use_num}
 
