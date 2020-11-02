@@ -2,7 +2,7 @@
 
 パッチ集合を入力としてクラス分類をするニューラルネットワークの研究．
 [PyTorch Lightning](https://github.com/PyTorchLightning/pytorch-lightning)と[Hydra](https://github.com/facebookresearch/hydra)を使っています．
-Pytorch LightningとHydraの使い方は[こちら](https://github.com/Kkun84/PyTorchLightningHydra)のリポジトリに準拠しています．
+Pytorch LightningとHydraの使い方は[こちら](https://github.com/Kkun84/PyTorchLightningHydra)のリポジトリを基としています．
 
 ## Dockerの利用
 
