@@ -79,3 +79,58 @@ bashでは`source hydra/tab_completion_bash hoge.py`，fishでは`source hydra/t
 ここでhoge.pyは対象のpyファイルに置き換えて下さい．
 ただし，
 これが有効化される範囲はそのシェル内のみなので，シェルを起動するたびに実行する必要があります．
+
+## Visual Studio Codeの利用
+
+使用するエディタにはVisual Studio Code(以下vscode)をおすすめします．
+ダウンロードは[こちら](https://code.visualstudio.com/)です．
+vscodeでは，コンテナへのアタッチや高度なデバッグなど，豊富な機能が利用できます．
+
+vscodeの設定ファイルは`.vscode/`にまとめられています．
+
+### 拡張機能
+
+おすすめの拡張機能が`.vscode/extensions.json`にまとめられています．
+vscodeの**フォルダーを開く**でこのプロジェクトを開けば，まとめてインストールすることもできます．
+
+### コンテナへのアタッチ
+
+vscodeの作業を動作中のコンテナ内部で行うことができます．
+これは，vscode上で**Remote - Containers拡張機能**をインストールすることで利用できます．
+拡張機能は[こちら](https://marketplace.visualstudio.com/items?itemName=ms-vscode-remote.remote-containers)です．
+
+実際にコンテナ内で作業するには，
+
+1. 事前にコンテナを作る（ターミナルで`./docker/run.sh`を実行する）．
+1. vscodeのコマンドパレットから**Remote-Containers: Attach to Running Container**を選択する．
+1. 動作中のコンテナ一覧が表示されるので，対象のコンテナを選ぶ．
+
+とします．
+vscodeの作業をコンテナ内で行う方法は他にもあります．
+これらの詳細を知るにはRemote - Containersの拡張機能について調べましょう．
+
+### デバッグ
+
+**F5キー**でデバッグができます．
+コンテナにアタッチしていればコンテナ内でもデバッグが可能です．
+詳細な説明はしませんが，非常に便利なので利用しましょう．
+
+デバッグの設定は`.vscode/launch.json`に記述されています．
+launch.jsonには以下の行が書かれています．
+```
+"args": ["debug=True", "experiment_name=__debug__"]
+```
+これは，デバッグ時の引数を指定しており，
+```
+python hoge.py debug=True experiment_name=__debug__
+```
+と実行されると考えればよいです．
+デバッグ時に動作させたい内容に応じてここは変えましょう．
+
+train.pyを`debug=True`として実行すると，Pytorch Lightnigの[fast_dev_run](https://pytorch-lightning.readthedocs.io/en/latest/trainer.html#fast-dev-run)が有効となります．
+これはバグを探すための機能です．
+これが有効だとtrain, valid, testがそれぞれバッチ数1で実行されます．
+
+train.pyを`experiment_name=__debug__`として実行すると実験の名前が__debug__となります．
+これはロギングへ影響するもので，実験結果を保存する名前やグループを設定しています．
+デバッグのログは通常実行のログとは区別したいことがほとんどなので，このようにしています．
