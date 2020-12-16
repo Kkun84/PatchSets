@@ -1,0 +1,191 @@
+[2020-12-16 14:20:33,091][__main__][INFO] - 
+project_name: PatchSets
+experiment_name: Default
+debug: false
+hparams:
+  patch_size: 15
+  hidden_n: 1024
+  output_n: ${data.class_num}
+  pool_mode: max
+  patch_num_min: 1
+  patch_num_max: 256
+  seed: 0
+  batch_size: 256
+  num_workers: 6
+  max_epochs: 10000
+  min_epochs: 10
+  patience: 100
+  optimizer: Adam
+  lr: 0
+  data_split_num: ${data.datamodule.data_split_num}
+  data_use_num: ${data.datamodule.data_use_num}
+data:
+  datamodule:
+    _target_: src.datamodule.AdobeFontDataModule
+    path: /dataset/AdobeFontCharImages
+    upper: true
+    lower: false
+    data_split_num: 5
+    data_use_num: 0
+    seed: ${hparams.seed}
+    batch_size: ${hparams.batch_size}
+    num_workers: ${hparams.num_workers}
+  name: AdobeFontCharImages
+  class_num: 26
+trainer:
+  max_epochs: ${hparams.max_epochs}
+  min_epochs: ${hparams.min_epochs}
+  auto_scale_batch_size: false
+  gpus: 1
+  auto_select_gpus: true
+  num_nodes: 1
+  accelerator: null
+  benchmark: true
+  deterministic: true
+  gradient_clip_val: 0
+  track_grad_norm: -1
+  overfit_batches: 0.0
+  precision: 32
+  fast_dev_run: ${debug}
+  profiler: simple
+  weights_summary: full
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  limit_test_batches: 1.0
+model_checkpoint:
+  monitor: valid_loss
+  verbose: false
+  save_last: null
+  save_top_k: null
+  save_weights_only: false
+  mode: min
+  prefix: ''
+  dirpath: ./checkpoints
+  filename: null
+early_stopping:
+  monitor: valid_loss
+  min_delta: 0
+  patience: ${hparams.patience}
+  verbose: false
+  mode: min
+callbacks: []
+loggers:
+- _target_: pytorch_lightning.loggers.TensorBoardLogger
+  save_dir: .
+  name: ''
+  version: lightning_logs
+- _target_: pytorch_lightning.loggers.MLFlowLogger
+  experiment_name: ${experiment_name}
+  tracking_uri: file:/workspace/mlruns
+  tags: null
+  save_dir: null
+- _target_: pytorch_lightning.loggers.NeptuneLogger
+  api_key: ${env:NEPTUNE_API_TOKEN}
+  project_name: kanda/${project_name}
+  experiment_name: ${experiment_name}
+  tags: null
+  upload_source_files:
+  - /workspace/src
+  - /workspace/config
+
+[2020-12-16 14:20:41,633][lightning][INFO] - NeptuneLogger will work in online mode
+[2020-12-16 14:20:42,958][lightning][INFO] - GPU available: True, used: True
+[2020-12-16 14:20:42,958][lightning][INFO] - TPU available: False, using: 0 TPU cores
+[2020-12-16 14:20:42,958][lightning][INFO] - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+[2020-12-16 14:20:48,678][lightning][INFO] - 
+   | Name             | Type           | Params
+-----------------------------------------------------
+0  | accuracy         | Accuracy       | 0     
+1  | squeeze_from_set | SqueezeFromSet | 0     
+2  | flatten          | Flatten        | 0     
+3  | linear_1         | Linear         | 231 K 
+4  | set_pooling_keep | SetPooling     | 0     
+5  | linear_2_a       | Linear         | 1 M   
+6  | linear_2_b       | Linear         | 1 M   
+7  | linear_3_a       | Linear         | 1 M   
+8  | linear_3_b       | Linear         | 1 M   
+9  | set_pooling      | SetPooling     | 0     
+10 | linear_4         | Linear         | 1 M   
+11 | linear_5         | Linear         | 26 K  
+[2020-12-16 14:21:06,155][lightning][INFO] - 
+
+Profiler Report
+
+Action              	|  Mean duration (s)	|  Total time (s) 
+-----------------------------------------------------------------
+on_fit_start        	|  1.8885e-05     	|  1.8885e-05     
+on_validation_start 	|  1.317e-05      	|  2.634e-05      
+on_validation_epoch_start	|  9.3274e-06     	|  1.8655e-05     
+on_validation_batch_start	|  1.5127e-05     	|  0.0003328      
+validation_step_end 	|  1.2709e-05     	|  0.0002796      
+on_validation_batch_end	|  9.6779e-06     	|  0.00021291     
+on_validation_epoch_end	|  2.6699e-05     	|  5.3399e-05     
+on_validation_end   	|  2.653e-05      	|  5.3059e-05     
+on_train_start      	|  2.6951e-05     	|  2.6951e-05     
+on_epoch_start      	|  1.569e-05      	|  3.1379e-05     
+on_train_epoch_start	|  1.2283e-05     	|  2.4566e-05     
+get_train_batch     	|  0.0086171      	|  0.84448        
+on_batch_start      	|  3.5902e-05     	|  0.0035184      
+on_train_batch_start	|  9.1086e-06     	|  0.00089264     
+training_step_end   	|  1.1837e-05     	|  0.00116        
+model_forward       	|  0.078658       	|  7.7085         
+model_backward      	|  0.022315       	|  2.1869         
+on_after_backward   	|  9.7162e-06     	|  0.00095219     
+optimizer_step      	|  0.1027         	|  10.064         
+on_batch_end        	|  1.452e-05      	|  0.0014229      
+on_train_batch_end  	|  0.00022726     	|  0.022272       
+on_epoch_end        	|  1.6756e-05     	|  3.3513e-05     
+on_train_epoch_end  	|  1.5239e-05     	|  3.0477e-05     
+on_train_end        	|  2.9215e-05     	|  2.9215e-05     
+
+[2020-12-16 14:21:06,274][lightning][INFO] - LR finder stopped early due to diverging loss.
+[2020-12-16 14:21:06,292][lightning][INFO] - Learning rate set to 0.0019054607179632484
+[2020-12-16 14:21:17,279][lightning][INFO] - 
+   | Name             | Type           | Params
+-----------------------------------------------------
+0  | accuracy         | Accuracy       | 0     
+1  | squeeze_from_set | SqueezeFromSet | 0     
+2  | flatten          | Flatten        | 0     
+3  | linear_1         | Linear         | 231 K 
+4  | set_pooling_keep | SetPooling     | 0     
+5  | linear_2_a       | Linear         | 1 M   
+6  | linear_2_b       | Linear         | 1 M   
+7  | linear_3_a       | Linear         | 1 M   
+8  | linear_3_b       | Linear         | 1 M   
+9  | set_pooling      | SetPooling     | 0     
+10 | linear_4         | Linear         | 1 M   
+11 | linear_5         | Linear         | 26 K  
+[2020-12-16 14:38:25,256][neptune.internal.channels.channels_values_sender][ERROR] - Failed to send channel value.
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/channels/channels_values_sender.py", line 156, in _send_values
+    self._experiment._send_channels_values(channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/experiments.py", line 1138, in _send_channels_values
+    self._backend.send_channels_values(self, channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/utils.py", line 210, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/backends/hosted_neptune_backend.py", line 572, in send_channels_values
+    raise ChannelsValuesSendBatchError(experiment.id, batch_errors)
+neptune.api_exceptions.ChannelsValuesSendBatchError: Received batch errors sending channels' values to experiment PATCH-121. Cause: Error(code=400, message='X-coordinates must be strictly increasing for channel: 0eb94bcc-1076-468b-8c09-c955b6b51c94. Invalid point: InputChannelValue(timestamp=2020-12-16T05:29:38.070Z, x=2849.0, numericValue=36.0, textValue=null, i', type=None) (metricId: '0eb94bcc-1076-468b-8c09-c955b6b51c94', x: 2849.0) Skipping 1 values.
+[2020-12-16 14:40:40,071][neptune.internal.channels.channels_values_sender][ERROR] - Failed to send channel value.
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/channels/channels_values_sender.py", line 156, in _send_values
+    self._experiment._send_channels_values(channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/experiments.py", line 1138, in _send_channels_values
+    self._backend.send_channels_values(self, channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/utils.py", line 210, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/backends/hosted_neptune_backend.py", line 572, in send_channels_values
+    raise ChannelsValuesSendBatchError(experiment.id, batch_errors)
+neptune.api_exceptions.ChannelsValuesSendBatchError: Received batch errors sending channels' values to experiment PATCH-121. Cause: Error(code=400, message='X-coordinates must be strictly increasing for channel: 0eb94bcc-1076-468b-8c09-c955b6b51c94. Invalid point: InputChannelValue(timestamp=2020-12-16T05:40:36.620Z, x=6699.0, numericValue=86.0, textValue=null, i', type=None) (metricId: '0eb94bcc-1076-468b-8c09-c955b6b51c94', x: 6699.0) Skipping 1 values.
+[2020-12-16 15:14:27,244][neptune.internal.channels.channels_values_sender][ERROR] - Failed to send channel value.
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/channels/channels_values_sender.py", line 156, in _send_values
+    self._experiment._send_channels_values(channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/experiments.py", line 1138, in _send_channels_values
+    self._backend.send_channels_values(self, channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/utils.py", line 210, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/backends/hosted_neptune_backend.py", line 572, in send_channels_values
+    raise ChannelsValuesSendBatchError(experiment.id, batch_errors)
+neptune.api_exceptions.ChannelsValuesSendBatchError: Received batch errors sending channels' values to experiment PATCH-121. Cause: Error(code=400, message='X-coordinates must be strictly increasing for channel: 0eb94bcc-1076-468b-8c09-c955b6b51c94. Invalid point: InputChannelValue(timestamp=2020-12-16T05:51:13.692Z, x=10549.0, numericValue=136.0, textValue=null,', type=None) (metricId: '0eb94bcc-1076-468b-8c09-c955b6b51c94', x: 10549.0) Skipping 1 values.
+[2020-12-16 15:20:59,651][__main__][INFO] - All done.
