@@ -11,17 +11,18 @@ debug: False
 
 hparams:
   patch_size: 15
-  hidden_n: 1024
+  hidden_n: 64
+  feature_n: 2
   output_n: ${data.class_num}
-  pool_mode: max
+  pool_mode: sum
   patch_num_min: 1
   patch_num_max: 256
   seed: 0
   batch_size: 256
   num_workers: 6
-  max_epochs: 10000
+  max_epochs: 100000
   min_epochs: 10
-  patience: 50
+  patience: 100
   optimizer: Adam
   lr: 0
   data_split_num: ${data.datamodule.data_split_num}
