@@ -4,6 +4,7 @@ import pytorch_lightning as pl
 from pytorch_lightning.callbacks import ModelCheckpoint, EarlyStopping
 from logging import getLogger
 from pathlib import Path
+import shutil
 import torchsummary
 
 from src.model import Model
@@ -17,6 +18,10 @@ def main(config) -> None:
     all_done = False
     try:
         logger.info('\n' + OmegaConf.to_yaml(config))
+
+        shutil.copytree(
+            Path(hydra.utils.get_original_cwd()) / 'src', Path.cwd() / 'copied' / 'src'
+        )
 
         pl.seed_everything(config.hparams.seed)
 
