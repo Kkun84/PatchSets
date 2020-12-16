@@ -4,7 +4,7 @@ defaults:
   - callbacks: basic
   - loggers: basic
 
-project_name: PyTorchLightningHydra
+project_name: PatchSets
 experiment_name: Default
 
 debug: False
