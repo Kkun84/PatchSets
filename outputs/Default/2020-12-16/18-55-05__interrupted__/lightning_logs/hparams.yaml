@@ -1,0 +1,17 @@
+batch_size: 256
+data_split_num: 5
+data_use_num: 0
+feature_n: 256
+hidden_n: 1024
+lr: 0.01
+max_epochs: 100000
+min_epochs: 10
+num_workers: 6
+optimizer: Adam
+output_n: 26
+patch_num_max: 256
+patch_num_min: 1
+patch_size: 15
+patience: 100
+pool_mode: sum
+seed: 0

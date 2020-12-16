@@ -1,0 +1,3 @@
+- loggers=neptune
+- hparams.hidden_n=1024
+- hparams.feature_n=256

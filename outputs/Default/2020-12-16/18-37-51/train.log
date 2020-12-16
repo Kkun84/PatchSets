@@ -1,0 +1,147 @@
+[2020-12-16 18:37:51,292][__main__][INFO] - 
+project_name: PatchSets
+experiment_name: Default
+debug: false
+hparams:
+  patch_size: 15
+  hidden_n: 64
+  feature_n: 2
+  output_n: ${data.class_num}
+  pool_mode: sum
+  patch_num_min: 1
+  patch_num_max: 256
+  seed: 0
+  batch_size: 256
+  num_workers: 6
+  max_epochs: 100000
+  min_epochs: 10
+  patience: 100
+  optimizer: Adam
+  lr: 0.01
+  data_split_num: ${data.datamodule.data_split_num}
+  data_use_num: ${data.datamodule.data_use_num}
+data:
+  datamodule:
+    _target_: src.datamodule.AdobeFontDataModule
+    path: /dataset/AdobeFontCharImages
+    upper: true
+    lower: false
+    data_split_num: 5
+    data_use_num: 0
+    seed: ${hparams.seed}
+    batch_size: ${hparams.batch_size}
+    num_workers: ${hparams.num_workers}
+  name: AdobeFontCharImages
+  class_num: 26
+trainer:
+  max_epochs: ${hparams.max_epochs}
+  min_epochs: ${hparams.min_epochs}
+  auto_scale_batch_size: false
+  gpus: 1
+  auto_select_gpus: true
+  num_nodes: 1
+  accelerator: null
+  benchmark: true
+  deterministic: true
+  gradient_clip_val: 0
+  track_grad_norm: -1
+  overfit_batches: 0.0
+  precision: 32
+  fast_dev_run: ${debug}
+  profiler: simple
+  weights_summary: full
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  limit_test_batches: 1.0
+model_checkpoint:
+  monitor: valid_loss
+  verbose: false
+  save_last: null
+  save_top_k: null
+  save_weights_only: false
+  mode: min
+  prefix: ''
+  dirpath: ./checkpoints
+  filename: null
+early_stopping:
+  monitor: valid_loss
+  min_delta: 0
+  patience: ${hparams.patience}
+  verbose: false
+  mode: min
+callbacks: []
+loggers:
+- _target_: pytorch_lightning.loggers.TensorBoardLogger
+  save_dir: .
+  name: ''
+  version: lightning_logs
+- _target_: pytorch_lightning.loggers.MLFlowLogger
+  experiment_name: ${experiment_name}
+  tracking_uri: file:/workspace/mlruns
+  tags: null
+  save_dir: null
+- _target_: pytorch_lightning.loggers.NeptuneLogger
+  api_key: ${env:NEPTUNE_API_TOKEN}
+  project_name: kanda/${project_name}
+  experiment_name: ${experiment_name}
+  tags: null
+  upload_source_files:
+  - /workspace/src
+  - /workspace/config
+
+[2020-12-16 18:37:59,612][lightning][INFO] - NeptuneLogger will work in online mode
+[2020-12-16 18:38:00,787][lightning][INFO] - GPU available: True, used: True
+[2020-12-16 18:38:00,787][lightning][INFO] - TPU available: False, using: 0 TPU cores
+[2020-12-16 18:38:00,787][lightning][INFO] - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+[2020-12-16 18:38:18,116][lightning][INFO] - 
+  | Name             | Type     | Params
+----------------------------------------------
+0 | accuracy         | Accuracy | 0     
+1 | flatten          | Flatten  | 0     
+2 | encoder_linear_1 | Linear   | 14 K  
+3 | encoder_linear_2 | Linear   | 130   
+4 | decoder_linear_1 | Linear   | 192   
+5 | decoder_linear_2 | Linear   | 1 K   
+[2020-12-16 18:46:31,975][neptune.internal.channels.channels_values_sender][ERROR] - Failed to send channel value.
+Traceback (most recent call last):
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/channels/channels_values_sender.py", line 156, in _send_values
+    self._experiment._send_channels_values(channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/experiments.py", line 1138, in _send_channels_values
+    self._backend.send_channels_values(self, channels_with_values)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/utils.py", line 210, in wrapper
+    return func(*args, **kwargs)
+  File "/opt/conda/lib/python3.7/site-packages/neptune/internal/backends/hosted_neptune_backend.py", line 572, in send_channels_values
+    raise ChannelsValuesSendBatchError(experiment.id, batch_errors)
+neptune.api_exceptions.ChannelsValuesSendBatchError: Received batch errors sending channels' values to experiment PATCH-123. Cause: Error(code=400, message='X-coordinates must be strictly increasing for channel: 096206f9-ab13-4ec5-9167-c96da0251343. Invalid point: InputChannelValue(timestamp=2020-12-16T09:46:26.657Z, x=3849.0, numericValue=49.0, textValue=null, i', type=None) (metricId: '096206f9-ab13-4ec5-9167-c96da0251343', x: 3849.0) Skipping 1 values.
+[2020-12-16 18:50:48,621][lightning][INFO] - 
+
+Profiler Report
+
+Action              	|  Mean duration (s)	|  Total time (s) 
+-----------------------------------------------------------------
+on_fit_start        	|  1.8955e-05     	|  1.8955e-05     
+on_validation_start 	|  0.00033509     	|  0.025802       
+on_validation_epoch_start	|  2.2251e-05     	|  0.0017133      
+on_validation_batch_start	|  1.684e-05      	|  0.025631       
+validation_step_end 	|  1.3246e-05     	|  0.02016        
+on_validation_batch_end	|  0.00025317     	|  0.38532        
+on_validation_epoch_end	|  3.7399e-05     	|  0.0028797      
+on_validation_end   	|  0.0017357      	|  0.13365        
+on_train_start      	|  0.00033623     	|  0.00033623     
+on_epoch_start      	|  0.00038711     	|  0.029807       
+on_train_epoch_start	|  1.6395e-05     	|  0.0012624      
+get_train_batch     	|  0.0036764      	|  21.683         
+on_batch_start      	|  2.3147e-05     	|  0.13652        
+on_train_batch_start	|  1.5185e-05     	|  0.089563       
+training_step_end   	|  1.2974e-05     	|  0.076519       
+model_forward       	|  0.067393       	|  397.49         
+model_backward      	|  0.033131       	|  195.41         
+on_after_backward   	|  1.1997e-05     	|  0.070744       
+optimizer_step      	|  0.10195        	|  601.3          
+on_batch_end        	|  2.2643e-05     	|  0.13353        
+on_train_batch_end  	|  0.0005586      	|  3.2941         
+on_epoch_end        	|  1.9638e-05     	|  0.0014925      
+on_train_epoch_end  	|  1.7988e-05     	|  0.0013671      
+on_train_end        	|  0.00071426     	|  0.00071426     
+
+[2020-12-16 18:51:05,509][__main__][INFO] - All done.

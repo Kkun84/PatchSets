@@ -1,0 +1,89 @@
+project_name: PatchSets
+experiment_name: Default
+debug: false
+hparams:
+  patch_size: 15
+  hidden_n: 1024
+  feature_n: 256
+  output_n: ${data.class_num}
+  pool_mode: max
+  patch_num_min: 1
+  patch_num_max: 256
+  seed: 0
+  batch_size: 256
+  num_workers: 6
+  max_epochs: 100000
+  min_epochs: 10
+  patience: 100
+  optimizer: Adam
+  lr: 0.01
+  data_split_num: ${data.datamodule.data_split_num}
+  data_use_num: ${data.datamodule.data_use_num}
+data:
+  datamodule:
+    _target_: src.datamodule.AdobeFontDataModule
+    path: /dataset/AdobeFontCharImages
+    upper: true
+    lower: false
+    data_split_num: 5
+    data_use_num: 0
+    seed: ${hparams.seed}
+    batch_size: ${hparams.batch_size}
+    num_workers: ${hparams.num_workers}
+  name: AdobeFontCharImages
+  class_num: 26
+trainer:
+  max_epochs: ${hparams.max_epochs}
+  min_epochs: ${hparams.min_epochs}
+  auto_scale_batch_size: false
+  gpus: 1
+  auto_select_gpus: true
+  num_nodes: 1
+  accelerator: null
+  benchmark: true
+  deterministic: true
+  gradient_clip_val: 0
+  track_grad_norm: -1
+  overfit_batches: 0.0
+  precision: 32
+  fast_dev_run: ${debug}
+  profiler: simple
+  weights_summary: full
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  limit_test_batches: 1.0
+model_checkpoint:
+  monitor: valid_loss
+  verbose: false
+  save_last: null
+  save_top_k: null
+  save_weights_only: false
+  mode: min
+  prefix: ''
+  dirpath: ./checkpoints
+  filename: null
+early_stopping:
+  monitor: valid_loss
+  min_delta: 0
+  patience: ${hparams.patience}
+  verbose: false
+  mode: min
+callbacks: []
+loggers:
+- _target_: pytorch_lightning.loggers.TensorBoardLogger
+  save_dir: .
+  name: ''
+  version: lightning_logs
+- _target_: pytorch_lightning.loggers.MLFlowLogger
+  experiment_name: ${experiment_name}
+  tracking_uri: file:/workspace/mlruns
+  tags: null
+  save_dir: null
+- _target_: pytorch_lightning.loggers.NeptuneLogger
+  api_key: ${env:NEPTUNE_API_TOKEN}
+  project_name: kanda/${project_name}
+  experiment_name: ${experiment_name}
+  tags: null
+  upload_source_files:
+  - /workspace/src
+  - /workspace/config

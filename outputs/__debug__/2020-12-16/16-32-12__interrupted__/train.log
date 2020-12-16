@@ -1,0 +1,79 @@
+[2020-12-16 16:32:13,198][__main__][INFO] - 
+project_name: PatchSets
+experiment_name: __debug__
+debug: true
+hparams:
+  patch_size: 15
+  hidden_n: 64
+  feature_n: 2
+  output_n: ${data.class_num}
+  pool_mode: sum
+  patch_num_min: 1
+  patch_num_max: 256
+  seed: 0
+  batch_size: 256
+  num_workers: 6
+  max_epochs: 10000
+  min_epochs: 10
+  patience: 50
+  optimizer: Adam
+  lr: 0
+  data_split_num: ${data.datamodule.data_split_num}
+  data_use_num: ${data.datamodule.data_use_num}
+data:
+  datamodule:
+    _target_: src.datamodule.AdobeFontDataModule
+    path: /dataset/AdobeFontCharImages
+    upper: true
+    lower: false
+    data_split_num: 5
+    data_use_num: 0
+    seed: ${hparams.seed}
+    batch_size: ${hparams.batch_size}
+    num_workers: ${hparams.num_workers}
+  name: AdobeFontCharImages
+  class_num: 26
+trainer:
+  max_epochs: ${hparams.max_epochs}
+  min_epochs: ${hparams.min_epochs}
+  auto_scale_batch_size: false
+  gpus: 1
+  auto_select_gpus: true
+  num_nodes: 1
+  accelerator: null
+  benchmark: true
+  deterministic: true
+  gradient_clip_val: 0
+  track_grad_norm: -1
+  overfit_batches: 0.0
+  precision: 32
+  fast_dev_run: ${debug}
+  profiler: simple
+  weights_summary: full
+  limit_train_batches: 1.0
+  limit_val_batches: 1.0
+  limit_test_batches: 1.0
+model_checkpoint:
+  monitor: valid_loss
+  verbose: false
+  save_last: null
+  save_top_k: null
+  save_weights_only: false
+  mode: min
+  prefix: ''
+  dirpath: ./checkpoints
+  filename: null
+early_stopping:
+  monitor: valid_loss
+  min_delta: 0
+  patience: ${hparams.patience}
+  verbose: false
+  mode: min
+callbacks: []
+loggers: []
+
+[2020-12-16 16:32:14,697][lightning][INFO] - GPU available: True, used: True
+[2020-12-16 16:32:14,697][lightning][INFO] - TPU available: False, using: 0 TPU cores
+[2020-12-16 16:32:14,698][lightning][INFO] - LOCAL_RANK: 0 - CUDA_VISIBLE_DEVICES: [0]
+[2020-12-16 16:32:14,698][lightning][INFO] - Running in fast_dev_run mode: will run a full train, val and test loop using a single batch
+[2020-12-16 16:32:14,702][__main__][INFO] - Rename directory name. "/workspace/outputs/__debug__/2020-12-16/16-32-12" -> "/workspace/outputs/__debug__/2020-12-16/16-32-12__interrupted"

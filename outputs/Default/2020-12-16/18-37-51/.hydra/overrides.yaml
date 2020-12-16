@@ -1,0 +1,2 @@
+- loggers=neptune
+- hparams.lr=0.01
