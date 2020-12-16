@@ -1,11 +1,11 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 import torch
 from torch import Tensor, nn, optim
 import torch.nn.functional as F
 import pytorch_lightning as pl
 from pytorch_lightning.core.decorators import auto_move_data
 
-import src.set_module as sm
+import set_module as sm
 
 
 class Model(pl.LightningModule):
@@ -13,20 +13,21 @@ class Model(pl.LightningModule):
         self,
         patch_size: int,
         hidden_n: int,
+        feature_n: int,
         output_n: int,
         pool_mode: str,
         patch_num_min: int,
         patch_num_max: int,
-        seed: int,
-        batch_size: int,
-        num_workers: int,
-        max_epochs: int,
-        min_epochs: int,
-        patience: int,
-        optimizer: str,
-        lr: float,
-        data_split_num: int,
-        data_use_num: int,
+        seed: int = None,
+        batch_size: int = None,
+        num_workers: int = None,
+        max_epochs: int = None,
+        min_epochs: int = None,
+        patience: int = None,
+        optimizer: str = None,
+        lr: float = None,
+        data_split_num: int = None,
+        data_use_num: int = None,
     ):
         super().__init__()
         self.save_hyperparameters()
@@ -35,43 +36,66 @@ class Model(pl.LightningModule):
             patch_num_min <= patch_num_max
         ), f'patch_num_min={patch_num_min}, patch_num_max={patch_num_max}'
 
+        self.pool_mode = pool_mode
+
         self.accuracy = pl.metrics.Accuracy()
 
-        self.squeeze_from_set = sm.SqueezeFromSet()
+        self.f_1 = nn.Sequential(
+            nn.Flatten(),
+            nn.Linear(patch_size ** 2, hidden_n),
+            nn.ReLU(),
+            nn.Linear(hidden_n, feature_n),
+        )
 
-        self.flatten = nn.Flatten()
-
-        self.linear_1 = nn.Linear(patch_size ** 2, hidden_n)
-
-        self.set_pooling_keep = sm.SetPooling(pool_mode, keep_shape=True)
-
-        self.linear_2_a = nn.Linear(hidden_n, hidden_n)
-        self.linear_2_b = nn.Linear(hidden_n, hidden_n)
-
-        self.linear_3_a = nn.Linear(hidden_n, hidden_n)
-        self.linear_3_b = nn.Linear(hidden_n, hidden_n)
-
-        self.set_pooling = sm.SetPooling(pool_mode)
-        self.linear_4 = nn.Linear(hidden_n, hidden_n)
-        self.linear_5 = nn.Linear(hidden_n, output_n)
+        self.f_2 = nn.Sequential(
+            nn.Linear(feature_n, hidden_n),
+            nn.ReLU(),
+            nn.Linear(hidden_n, output_n),
+        )
 
     @auto_move_data
-    def forward(self, batch_set: sm.BatchSetType) -> Tensor:
-        x, index = self.squeeze_from_set(batch_set)
-        x = self.flatten(x)
-        x = self.linear_1(x).relu()
-        x = (
-            self.linear_2_a(x).relu()
-            + self.linear_2_b(self.set_pooling_keep(x, index)[0]).relu()
-        )
-        x = (
-            self.linear_3_a(x).relu()
-            + self.linear_3_b(self.set_pooling_keep(x, index)[0]).relu()
-        )
-        x, index = self.set_pooling(x, index)
-        x = self.linear_4(x).relu()
-        x = self.linear_5(x)
-        output = x
+    def encode(
+        self, patch_set: Union[List[Tensor], Tensor]
+    ) -> Union[List[Tensor], Tensor]:
+        if isinstance(patch_set, Tensor):
+            x = patch_set.reshape(
+                patch_set.shape[0] * patch_set.shape[1], *patch_set[2:]
+            )
+            x = self.f_1(x)
+            x = x.reshape(*patch_set.shape[:2], *x.shape[2:])
+        elif isinstance(patch_set, list):
+            x = patch_set
+            x = [self.f_1(i) for i in x]
+        else:
+            assert False
+        return x
+
+    @auto_move_data
+    def pool(self, feature_set: Union[List[Tensor], Tensor]) -> Tensor:
+        if self.pool_mode == 'max':
+            pool = lambda *args, **kwargs,: torch.max(*args, **kwargs)[0]
+        else:
+            pool = getattr(torch, self.pool_mode)
+        if isinstance(feature_set, Tensor):
+            x = pool(feature_set, 1)
+        elif isinstance(feature_set, list):
+            x = [pool(i, 0) for i in feature_set]
+            x = torch.stack(x)
+        else:
+            assert False
+        return x
+
+    @auto_move_data
+    def decode(self, features: Tensor) -> Tensor:
+        x = features
+        x = self.f_2(x)
+        return x
+
+    @auto_move_data
+    def forward(self, patch_set: Union[List[Tensor], Tensor]) -> Tensor:
+        feature_set = self.encode(patch_set)
+        features = self.pool(feature_set)
+        output = self.decode(features)
         return output
 
     def configure_optimizers(self) -> optim.Optimizer:
@@ -147,14 +171,27 @@ class Model(pl.LightningModule):
 
 
 if __name__ == '__main__':
+    from torchsummary import summary
+
     image_size = 10
     patch_size = 3
     hidden_n = 64
+    feature_n = 2
     output_n = 2
+    pool_mode = 'max'
     patch_num_min = 1
     patch_num_max = 5
 
-    model = Model(patch_size, hidden_n, output_n, patch_num_min, patch_num_max)
+    model = Model(
+        patch_size,
+        hidden_n,
+        feature_n,
+        output_n,
+        pool_mode,
+        patch_num_min,
+        patch_num_max,
+    )
+    summary(model)
 
     batch_size = 5
     image = (
