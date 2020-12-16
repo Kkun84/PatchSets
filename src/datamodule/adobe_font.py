@@ -86,7 +86,7 @@ class AdobeFontDataModule(pl.LightningDataModule):
                 self.lower,
                 test_index,
             )
-            self.test_dataset = [i for i in self.test_dataset] * 16
+#             self.test_dataset = [i for i in self.test_dataset] * 16
 
     def train_dataloader(self) -> DataLoader:
         return DataLoader(
