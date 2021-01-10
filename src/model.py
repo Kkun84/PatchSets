@@ -5,7 +5,7 @@ import torch.nn.functional as F
 import pytorch_lightning as pl
 from pytorch_lightning.core.decorators import auto_move_data
 
-import set_module as sm
+import src.set_module as sm
 
 
 class Model(pl.LightningModule):
