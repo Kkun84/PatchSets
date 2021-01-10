@@ -10,13 +10,13 @@ experiment_name: Default
 debug: False
 
 hparams:
-  patch_size: 15
+  patch_size: 25
   hidden_n: 64
   feature_n: 2
   output_n: ${data.class_num}
   pool_mode: sum
   patch_num_min: 1
-  patch_num_max: 256
+  patch_num_max: 64
   seed: 0
   batch_size: 256
   num_workers: 6
