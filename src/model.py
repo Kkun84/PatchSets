@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, List, Iterable, Union
 import torch
 from torch import Tensor, nn, optim
 import torch.nn.functional as F
@@ -47,7 +47,7 @@ class Model(pl.LightningModule):
             nn.Linear(hidden_n, feature_n),
         )
 
-        self.f_2 = nn.Sequential(
+        self.f = nn.Sequential(
             nn.Linear(feature_n, hidden_n),
             nn.ReLU(),
             nn.Linear(hidden_n, output_n),
@@ -55,44 +55,52 @@ class Model(pl.LightningModule):
 
     @auto_move_data
     def encode(
-        self, patch_set: Union[List[Tensor], Tensor]
+        self, patch_set: Union[Iterable[Tensor], Tensor]
     ) -> Union[List[Tensor], Tensor]:
         if isinstance(patch_set, Tensor):
             x = patch_set.reshape(
-                patch_set.shape[0] * patch_set.shape[1], *patch_set[2:]
+                patch_set.shape[0] * patch_set.shape[1], *patch_set.shape[2:]
             )
             x = self.f_1(x)
-            x = x.reshape(*patch_set.shape[:2], *x.shape[2:])
+            # x = self.f_2_1(x) + self.pool(self.f_2_2(x), True)
+            # x = self.f_3_1(x) + self.pool(self.f_3_2(x), True)
+            # x = self.f_4(x)
+            x = x.reshape(*patch_set.shape[:2], *x.shape[1:])
         elif isinstance(patch_set, list):
             x = patch_set
-            x = [self.f_1(i) for i in x]
+            x = [self.f_1(x) for x in x]
+            # x = [self.f_2_1(x) + self.pool(self.f_2_2(x), True) for x in x]
+            # x = [self.f_3_1(x) + self.pool(self.f_3_2(x), True) for x in x]
+            # x = [self.f_4(x) for x in x]
         else:
             assert False
         return x
 
     @auto_move_data
-    def pool(self, feature_set: Union[List[Tensor], Tensor]) -> Tensor:
+    def pool(
+        self, feature_set: Union[Iterable[Tensor], Tensor], keepdim: bool = False
+    ) -> Tensor:
         if self.pool_mode == 'max':
             pool = lambda *args, **kwargs,: torch.max(*args, **kwargs)[0]
         else:
             pool = getattr(torch, self.pool_mode)
         if isinstance(feature_set, Tensor):
-            x = pool(feature_set, 1)
+            x = pool(feature_set, 1, keepdim=keepdim)
         elif isinstance(feature_set, list):
-            x = [pool(i, 0) for i in feature_set]
+            x = [pool(i, 0, keepdim=keepdim) for i in feature_set]
             x = torch.stack(x)
         else:
             assert False
         return x
 
     @auto_move_data
-    def decode(self, features: Tensor) -> Tensor:
-        x = features
-        x = self.f_2(x)
+    def decode(self, feature: Tensor) -> Tensor:
+        x = feature
+        x = self.f(x)
         return x
 
     @auto_move_data
-    def forward(self, patch_set: Union[List[Tensor], Tensor]) -> Tensor:
+    def forward(self, patch_set: Union[Iterable[Tensor], Tensor]) -> Tensor:
         feature_set = self.encode(patch_set)
         features = self.pool(feature_set)
         output = self.decode(features)
@@ -110,8 +118,16 @@ class Model(pl.LightningModule):
         patch_sets = sm.cutout_patch2d(
             x,
             torch.randint(
-                self.hparams.patch_num_min, self.hparams.patch_num_max + 1, [batch_size]
+                self.hparams.patch_num_min,
+                self.hparams.patch_num_max + 1,
+                [batch_size],
             ),
+            # [
+            #     torch.randint(
+            #         self.hparams.patch_num_min, self.hparams.patch_num_max + 1, [1]
+            #     )
+            # ]
+            # * batch_size,
             self.hparams.patch_size,
         )
         y_hat = self.forward(patch_sets)
@@ -175,7 +191,7 @@ if __name__ == '__main__':
 
     image_size = 10
     patch_size = 3
-    hidden_n = 64
+    hidden_n = 256
     feature_n = 2
     output_n = 2
     pool_mode = 'max'
