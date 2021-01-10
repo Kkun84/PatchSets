@@ -10,7 +10,7 @@
             "request": "launch",
             "program": "${file}",
             "console": "integratedTerminal",
-            "args": ["debug=True", "experiment_name=__debug__"]
+            "args": ["debug=True", "experiment_name=__debug__", "loggers=none"]
         }
     ]
 }
