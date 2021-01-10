@@ -31,3 +31,5 @@ hparams:
 hydra:
   run:
     dir: ./outputs/${experiment_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
+  sweep:
+    dir: ./outputs/${experiment_name}/${now:%Y-%m-%d}/${now:%H-%M-%S}
