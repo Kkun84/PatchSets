@@ -27,3 +27,5 @@ RUN useradd -m --uid=${UID} --gid=${USER}_group --groups=sudo ${USER}
 RUN echo ${USER}:${PASSWORD} | chpasswd
 RUN echo 'root:root' | chpasswd
 USER ${USER}
+
+ENV PATH $PATH:/home/${USER}/.local/bin
