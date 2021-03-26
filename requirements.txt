@@ -139,7 +139,7 @@ pytorch-lightning==1.0.4
 pytorch-lightning-bolts==0.2.5
 pytz==2020.1
 PyWavelets==1.1.1
-PyYAML==5.3.1
+PyYAML==5.4
 pyzmq==19.0.2
 querystring-parser==1.2.4
 regex==2020.10.28
