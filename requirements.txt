@@ -82,7 +82,7 @@ mistune==0.8.4
 mkl-fft==1.1.0
 mkl-random==1.1.1
 mkl-service==2.3.0
-mlflow==1.11.0
+mlflow==1.23.1
 monotonic==1.5
 more-itertools==8.5.0
 msgpack==1.0.0
