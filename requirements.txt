@@ -61,7 +61,7 @@ isodate==0.6.0
 itsdangerous==1.1.0
 jedi==0.17.1
 Jinja2==2.11.2
-joblib==0.17.0
+joblib==1.2.0
 json5==0.9.5
 jsonref==0.2
 jsonschema==3.2.0
